@@ -236,29 +236,13 @@ public class controller {
         return "-1";
     }
 
-    @PostMapping(path = "/addproduit/{id}")
-    ResponseEntity<Produit> ajouterProduit(@RequestBody Produit p,
-            @PathVariable(name = "id") String id,
-            @RequestPart MultipartFile img) throws IOException {
-        Categorie cat = catR.findById(id).get();
-        String img_name = img.getOriginalFilename();
-
-        cat.ajouterProduit(p);
-        catR.save(cat);
-        File f = new File("images_gestion_entreprise/", img_name);
-        FileOutputStream fout = new FileOutputStream(f);
-        fout.write(img.getBytes());
-        fout.close();
-        return new ResponseEntity<>(pr.save(p), HttpStatus.CREATED);
-
-    }
-
     @PostMapping(path = "/ajouter_produit/{id}")
     ResponseEntity<Produit> ajouter_produitf(@RequestBody Produit p, @PathVariable String id) {
         Categorie cat = catR.findById(id).get();
+        Produit produi = pr.save(p);
         cat.ajouterProduit(p);
         catR.save(cat);
-        return new ResponseEntity<Produit>(pr.save(p), HttpStatus.CREATED);
+        return new ResponseEntity<Produit>(produi, HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/get_clients/{id}")
@@ -413,7 +397,7 @@ public class controller {
                 }
             }
         });
-        if (id_2.equals("-1")) {
+        if (!id_2.equals("-1")) {
             try {
 
                 Commande commande = commandeRepo.getCommandebyName(v.getNumeroCommande());
