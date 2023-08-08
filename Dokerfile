@@ -1,3 +1,18 @@
-FROM maven:3.8.5-openjdk-17 AS build
-COPY . .
-RUN mvn clean package -DskipTests
+# Utilise l'image Ubuntu officielle comme base
+FROM ubuntu:latest
+
+# Installer les dépendances nécessaires
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk
+
+# Copier le fichier JAR de l'application Spring Boot dans le conteneur
+COPY target/mon_application.jar /app/mon_application.jar
+
+# Définir le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Exposer le port sur lequel l'application Spring Boot écoute (remplacez 8080 par le port réel de votre application si nécessaire)
+EXPOSE 8080
+
+# Commande pour exécuter l'application Spring Boot lorsque le conteneur démarre
+CMD ["java", "-jar", "mon_application.jar"]
