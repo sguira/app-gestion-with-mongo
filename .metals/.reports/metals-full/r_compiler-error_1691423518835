@@ -1,0 +1,63 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 651
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/entities/Commande.java
+text:
+package com.application.mongo.app_e_feray.entities;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Document
+public class Commande implements Serializable {
+
+    @Id
+    public Long reference;
+
+    public String ref;
+    public String date;
+    public double montant;
+
+    @Column(nullable = false)
+    public@@ long idC;
+    public String nomC;
+
+    public String description;
+    public boolean terminer;
+
+    // @OneToMany(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    // public List<ventes> ventes=new ArrayList<ventes>();
+
+    // public void ajouterCommande(ventes v){
+    // ventes.add(v);
+    // }
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:325)

@@ -1,0 +1,136 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 1408
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/entities/Users.java
+text:
+package com.application.mongo.app_e_feray.entities;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Document()
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class Users {
+
+    @Id
+    private Long id;
+
+    private String name;
+
+    private String last_name;
+    private String number;
+
+    private String email;
+    private String password;
+    private String image_url;
+    private InfoEntreprise info;
+
+    private boolean suscription = false;
+    String dateAbonnement;
+    double montantAbonnement;
+    String code;
+    String finAbonnement;
+
+   
+    private String recuperation;
+
+
+    String lang = "fr";
+
+    @DBRef
+    private List<Categorie> categories = new ArrayList<>();
+
+   @DBRef
+    private List<Client> clients = new ArrayList<>();
+
+   
+
+    @DBRef
+    private List<Fournisseur> fournisseurs = new ArrayList<>();
+
+    @DBRef
+    private List<Achat> achats = new ArrayList<>();
+
+    // @JsonProperty(access = Access.WRITE_ONLY)
+    @@@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ventes> ventes = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Tache> taches = new ArrayList();
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Commande> commande = new ArrayList<>();
+
+    public void ajouterCategorie(Categorie cat) {
+        this.categories.add(cat);
+    }
+
+    public void ajouter_client(Client u) {
+        this.clients.add(u);
+    }
+
+    public void ajouter_contact(Contact c) {
+        this.contacts.add(c);
+    }
+
+    public void ajouter_fournisseur(Fournisseur f) {
+        this.fournisseurs.add(f);
+    }
+
+    public void ajouter_ventes(ventes v) {
+        this.ventes.add(v);
+    }
+
+    public void ajouter_achats(Achat a) {
+        this.achats.add(a);
+    }
+
+    public void ajouter_tache(Tache t) {
+        this.taches.add(t);
+    }
+
+    public void addCommande(Commande t) {
+        this.commande.add(t);
+    }
+
+    public String formatMail() {
+        return "Cher client nous vous souhaitons la bienvenue sur notre l'application " +
+                "Vous venez de créer un compte sur l'application E-Guira avec les informations suivantes:" + "\n Nom:"
+                + name + "\tEmail:" + email + "\tNom Entreprise:" + info.name + "\tNuméro:" + info.telephone
+                + "\tAdresse:" + info.addresse
+                + "Vous pouvez à present vous connecter grâce à votre nom d'utilisateur" + email
+                + " et votre mot de passe:**********";
+    }
+    
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:325)

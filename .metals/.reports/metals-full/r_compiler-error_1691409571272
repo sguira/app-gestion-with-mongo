@@ -1,0 +1,55 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 608
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/repository/UserRepositori.java
+text:
+package com.application.mongo.app_e_feray.repository;
+
+import java.util.List;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.application.mongo.app_e_feray.entities.Users;
+
+public interface UserRepositori extends MongoRepository<Users,Long> {
+    
+    @Query(value = "SELECT sum(A.montant) from achat A,users U, users_achats U_C where U_C.users_id=1 and A.id=U_C.achats_id and A.date between :#{#date1} and :#{#date2} and U.id=1 ", nativeQuery = tru@@e)
+    Double get_bilan_achat_montant(@Param("date2") String date2, @Param("date1") String date1);
+
+    @Query(value = "SELECT sum(A.espece) from ventes A,users U, users_ventes U_C where U_C.users_id=1 and A.id=U_C.ventes_id and A.date between :#{#date1} and :#{#date2} and U.id=1 ")
+    Double get_bilan_ventes_montant(@Param("date2") String date2, @Param("date1") String date1);
+
+    @Query(value = "SELECT sum(A.espece) from achat A,users U, users_achats U_C where U_C.users_id=1 and A.id=U_C.achats_id and A.date between :#{#date1} and :#{#date2} and U.id=1 ")
+    Double get_bilan_achat_paye(@Param("date2") String date2, @Param("date1") String date1);
+
+    @Query(value = "SELECT sum(A.espece) from ventes A,users U, users_ventes U_C where U_C.users_id=1 and A.id=U_C.ventes_id and A.date between :#{#date1} and :#{#date2} and U.id=1 ")
+    Double get_bilan_ventes_paye(@Param("date2") String date2, @Param("date1") String date1);
+
+    @Query(value = "SELECT sum(V.payee) from ventes V,users U,users_ventes U_V where U_V.users_id = :#{#id} and V.id=U_V.ventes_id and V.date=:#{#date_} ")
+    Double get_ventes_journaliere(@Param("date_") String date, @Param("id") Long id);
+
+    @Query(value = " SELECT DAYOFWEEK(now()); ")
+    List ventes_de_la_semaine();
+
+    @Query(value = "SELECT date,code,prix FROM ventes V,users_ventes U_V, WHERE V.id=U_V.ventes_id , U_V.users_id = :#{#id} ")
+    List<?> all_ventes(@Param("id") Long id);
+
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:325)

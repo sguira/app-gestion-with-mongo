@@ -1,0 +1,35 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 332
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/repository/FournisseurRepo.java
+text:
+package com.application.mongo.app_e_feray.repository;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.application.mongo.app_e_feray.entities.Fournisseur;
+
+public interface FournisseurRepo extends MongoRepository<Fournisseur, Long> {
+
+    @Query(value = "SELECT count(id) from fournisseur", n@@ativeQuery = true)
+    public int get_fournisseur();
+
+    // @Query(value="select sum(montant) from achat where id")
+
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:325)

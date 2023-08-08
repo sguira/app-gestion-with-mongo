@@ -1,0 +1,40 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 456
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/repository/ClientRepo.java
+text:
+package com.application.mongo.app_e_feray.repository;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+
+import com.application.mongo.app_e_feray.entities.Client;
+
+import jakarta.websocket.server.PathParam;
+
+public interface ClientRepo extends MongoRepository<Client, Long> {
+
+    @Query(value = "SELECT c.name c from client c Where c.name like '%{#name}%'")
+    List@@<Client> search_by_name(@PathParam("id") String id, @PathParam("name") String name);
+
+    @Query(value = "SELECT V FROM users_ventes U_V,commande C, ventes V Where U_V.users_id={#id}and V.ventes_id=U_V.id,v.numero_commande={#name} ", nativeQuery = true)
+    List<ventes> getVenteCommande(@PathParam("id") Long id, @PathParam("name") String name);
+
+
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.HoverProvider$.hover(HoverProvider.scala:34)
+	scala.meta.internal.pc.ScalaPresentationCompiler.hover$$anonfun$1(ScalaPresentationCompiler.scala:325)

@@ -1,0 +1,33 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 251
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/repository/TacheRepositorie.java
+text:
+package com.application.mongo.app_e_feray.repository;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.application.mongo.app_e_feray.entities.Tache;
+
+public interface TacheRepositorie extends MongoRepository<Tache@@, Long> {
+
+    @Query(nativeQuery = true, value = " SELECT * from tache t,users_taches u WHERE u.users_id=:#{#id},t.date=:#{#date}")
+    List<Tache> findTacheNow(@Param("date") String date, @Param("id") Long id) throws SQLException;
+
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.SignatureHelpProvider$.signatureHelp(SignatureHelpProvider.scala:40)
+	scala.meta.internal.pc.ScalaPresentationCompiler.signatureHelp$$anonfun$1(ScalaPresentationCompiler.scala:371)

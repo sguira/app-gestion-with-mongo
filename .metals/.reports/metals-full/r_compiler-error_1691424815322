@@ -1,0 +1,62 @@
+java.util.NoSuchElementException: next on empty iterator
+occurred in the presentation compiler.
+
+action parameters:
+offset: 52
+uri: file:///C:/Users/sguir/Desktop/GESTION%20CLIENT%20APP/app/mongo/app_e_feray/src/main/java/com/application/mongo/app_e_feray/controller/verifier.java
+text:
+package com.application.mongo.app_e_feray.controller@@;
+
+public class verifier {
+
+    static boolean addUsers(List<Users> list, String email) {
+
+        if (list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getEmail().equals(email)) {
+                    return true;
+
+                }
+            }
+        }
+        return false;
+    }
+
+    // static Users searchUserByEmail(List<Users> list, String email) {
+    // for (int i = 0; i < list.size(); i++) {
+    // if (list.get(i).equals(email)) {
+    // return (Users) list.get(i);
+    // }
+    // }
+    // return null;
+    // }
+
+    static int search_category(List<Categorie> list, String name) {
+
+        if (list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getName() != null) {
+                    if (list.get(i).getName().equals(name)) {
+                        return 1;
+                    }
+                }
+
+            }
+        }
+        return 0;
+    }
+}
+
+
+
+error stacktrace:
+scala.collection.Iterator$$anon$19.next(Iterator.scala:973)
+	scala.collection.Iterator$$anon$19.next(Iterator.scala:971)
+	scala.collection.mutable.MutationTracker$CheckedIterator.next(MutationTracker.scala:76)
+	scala.collection.IterableOps.head(Iterable.scala:222)
+	scala.collection.IterableOps.head$(Iterable.scala:222)
+	scala.collection.AbstractIterable.head(Iterable.scala:933)
+	dotty.tools.dotc.interactive.InteractiveDriver.run(InteractiveDriver.scala:168)
+	scala.meta.internal.pc.MetalsDriver.run(MetalsDriver.scala:45)
+	scala.meta.internal.pc.SignatureHelpProvider$.signatureHelp(SignatureHelpProvider.scala:40)
+	scala.meta.internal.pc.ScalaPresentationCompiler.signatureHelp$$anonfun$1(ScalaPresentationCompiler.scala:371)
