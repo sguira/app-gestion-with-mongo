@@ -26,10 +26,4 @@ public class Produit implements Serializable {
     private int quantite;
     private String reference;
 
-    // @Lob
-    // private Byte[] image;
-
-    // @ManyToOne
-    // private Categorie cat;
-
 }

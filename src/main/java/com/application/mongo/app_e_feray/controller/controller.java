@@ -443,17 +443,10 @@ public class controller {
 
     @PostMapping(path = "/save_produit/{id_2}")
     ResponseEntity<?> save_article(@PathVariable(name = "id_2") String id,
+            Produit produit) {
 
-            @RequestParam(name = "name") String nom,
-            @RequestParam(name = "description") String description, @RequestParam(name = "prix") String prix,
-            @RequestParam(name = "quantite") String quantite) {
-        Produit p = new Produit();
-        Produit p_ = pr.save(p);
+        Produit p_ = pr.save(produit);
         // create the product
-        p.setDescription(description);
-        p.setName(nom);
-        p.setPrix(Double.parseDouble(prix));
-        p.setQuantite(Integer.parseInt(quantite));
 
         Categorie cat = catR.findById(id).get();
         cat.ajouterProduit(p_);
