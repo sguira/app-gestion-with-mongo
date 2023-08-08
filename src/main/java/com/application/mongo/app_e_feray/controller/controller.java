@@ -499,7 +499,7 @@ public class controller {
             @PathVariable(name = "id_2") String id_,
             @RequestBody Achat a) {
         Achat a_ = achatR.save(a);
-        if (id_.equals("-1")) {
+        if (!id_.equals("-1")) {
             Users u = usersR.findById(id).get();
             Fournisseur f = fournisseurRepo.findById(id_).get();
 
