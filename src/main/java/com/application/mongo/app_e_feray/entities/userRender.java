@@ -20,5 +20,6 @@ public class userRender implements Serializable {
     public InfoEntreprise info;
     public String dateFin;
     public String dateDebut;
+    public String numeroCompte;
 
 }
