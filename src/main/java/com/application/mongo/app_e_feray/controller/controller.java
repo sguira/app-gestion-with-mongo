@@ -386,7 +386,7 @@ public class controller {
         Users u = usersR.findById(id_1).get();
         String item = v.getPrix() + "," + v.getDate();
         v.addVentes(item);
-        System.out.println("\n\n" + v.getNumeroCommande());
+        Commande commande = new Commande();
         v.getArticles_().forEach((article) -> {
             List<Produit> produit = pr.findAll();
             for (var i = 0; i < produit.size(); i++) {
@@ -400,7 +400,9 @@ public class controller {
         if (!id_2.equals("-1")) {
             try {
 
-                Commande commande = commandeRepo.getCommandebyName(v.getNumeroCommande());
+                if (!v.getNumeroCommande().equals("")) {
+                    commande = commandeRepo.getCommandebyName(v.getNumeroCommande());
+                }
                 String name = clientR.findById(id_2).get().getName();
                 v.setNomClient(name);
                 if (commande != null) {
@@ -481,15 +483,36 @@ public class controller {
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/get_bilan/{date1}/{date2}")
+    @GetMapping(path = "/get_bilan/{date1}/{date2}/{id}")
     ResponseEntity<Bilan> bilan_ventes(@PathVariable(name = "date2") String date2,
-            @PathVariable(name = "date1") String date1) {
+            @PathVariable(name = "date1") String date1, @PathVariable(name = "id") String id) {
         Bilan bilan = new Bilan();
 
-        bilan.setMontant_achat(usersR.get_bilan_achat_montant(date2, date1));
-        bilan.setMontant_vente(usersR.get_bilan_ventes_montant(date2, date1));
-        bilan.setPaye_achat(usersR.get_bilan_achat_paye(date2, date1));
-        bilan.setPaye_vente(usersR.get_bilan_ventes_paye(date2, date1));
+        // bilan.setMontant_achat(usersR.get_bilan_achat_montant(date2, date1, id));
+        // bilan.setMontant_vente(usersR.get_bilan_ventes_montant(date2, date1, id));
+        // bilan.setPaye_achat(usersR.get_bilan_achat_paye(date2, date1, id));
+        // bilan.setPaye_vente(usersR.get_bilan_ventes_paye(date2, date1, id));
+        Users u = usersR.findById(id).get();
+        double achat = 0;
+        double vente = 0;
+        double payeV = 0;
+        double payeA = 0;
+        for (var element : u.getAchats()) {
+            if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
+                achat += element.getMontant();
+                payeA += element.getEspece();
+                bilan.setMontant_achat(achat);
+                bilan.setPaye_achat(payeA);
+            }
+        }
+        for (var element : u.getVentes()) {
+            if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
+                vente += element.getPrix();
+                payeV += element.getEspece();
+                bilan.setMontant_vente(vente);
+                bilan.setPaye_vente(payeV);
+            }
+        }
 
         return new ResponseEntity<Bilan>(bilan, HttpStatus.OK);
     }
@@ -637,42 +660,39 @@ public class controller {
     @PutMapping(path = "/update_client/{id}")
     ResponseEntity<Client> update_client(@PathVariable(name = "id") String id, @RequestBody Client c) {
         Users u = usersR.findById(id).get();
-
+        Client client = clientR.findById(c.getId()).get();
         List<Client> clients = u.getClients();
         for (int i = 0; i < clients.size(); i++) {
             if (clients.get(i).getId().toString().equals(c.getId().toString())) {
-                clients.get(i).setEmail(c.getEmail());
-                clients.get(i).setName(c.getName());
-                clients.get(i).setNumber(c.getNumber());
-                System.out.println("\n\n" + c.getNumber() + "\tvrai:" + clients.get(i).getNumber());
+                client.setEmail(c.getEmail());
+                client.setName(c.getName());
+                client.setNumber(c.getNumber());
+                u.getClients().set(i, client);
                 break;
             }
         }
         usersR.save(u);
-        return new ResponseEntity<Client>(clientR.save(c), HttpStatus.OK);
+        return new ResponseEntity<Client>(clientR.save(client), HttpStatus.OK);
     }
 
     // Fonction pour modifier un client
     @PutMapping(path = "/update_fournisseur/{id}")
     ResponseEntity<Fournisseur> update_fournisseur(@PathVariable(name = "id") String id, @RequestBody Fournisseur c) {
         Users u = usersR.findById(id).get();
-        System.out.println("Le client recu:>>>");
-        System.out.println("id:" + c.getId());
-        System.out.println("Name:" + c.getName());
-        System.out.println("Email:" + c.getEmail());
-        System.out.println("Number:" + c.getNumber());
-        System.out.println(c.getId() + " le id >>>>>>>>>>>>>>>\n\n\n");
+
         List<Fournisseur> f = u.getFournisseurs();
+        Fournisseur fournisseur = fournisseurRepo.findById(c.getId()).get();
         for (int i = 0; i < f.size(); i++) {
-            if (f.get(i).getId() == c.getId()) {
-                f.get(i).setEmail(c.getEmail());
-                f.get(i).setName(c.getName());
-                f.get(i).setNumber(c.getNumber());
+            if (f.get(i).getId().equals(c.getId())) {
+                fournisseur.setEmail(c.getEmail());
+                fournisseur.setName(c.getName());
+                fournisseur.setNumber(c.getNumber());
+                u.getFournisseurs().set(i, fournisseur);
                 break;
             }
         }
         usersR.save(u);
-        return new ResponseEntity<Fournisseur>(fournisseurRepo.save(c), HttpStatus.OK);
+        return new ResponseEntity<Fournisseur>(fournisseurRepo.save(fournisseur), HttpStatus.OK);
     }
 
     // ventes de la semaine
@@ -720,14 +740,15 @@ public class controller {
     }
 
     @PostMapping(path = "/add_tache/{id}")
-    ResponseEntity<?> add_tache(@PathVariable(name = "id") String id, @RequestBody Tache t) {
+    ResponseEntity<Tache> add_tache(@PathVariable(name = "id") String id, @RequestBody Tache t) {
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         System.out.println("\n\ntaches: \n" + t);
 
         Users u = usersR.findById(id).get();
-        u.ajouter_tache(tacheR.save(t));
+        Tache tache = tacheR.save(t);
+        u.ajouter_tache(tache);
         usersR.save(u);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<Tache>(tache, HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/find_days/{id}/{date}")

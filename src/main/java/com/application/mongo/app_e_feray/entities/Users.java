@@ -42,7 +42,7 @@ public class Users {
     double montantAbonnement;
     String code;
     String finAbonnement;
-
+    String numeroCompte;
     private String recuperation;
 
     String lang = "fr";
