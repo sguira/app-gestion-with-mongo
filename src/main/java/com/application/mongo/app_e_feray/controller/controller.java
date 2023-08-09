@@ -531,7 +531,7 @@ public class controller {
     }
 
     // delete
-    @DeleteMapping(path = "/delete/{id}/{parent_id}/{choice}")
+    @DeleteMapping(path = "/delete/{id}")
     int delete(@PathVariable(name = "id") String id, @PathVariable(name = "parent_id") String parent,
             @PathVariable(name = "choice") int choice) {
         switch (choice) {
@@ -805,7 +805,7 @@ public class controller {
 
     @PostMapping("/ajouterCommande/{id}/{id2}")
     ResponseEntity<Commande> addCommande(@RequestBody Commande c, @PathVariable(name = "id") String id,
-            @PathVariable(name = "id2") String id_) {
+            @PathVariable(name = "id2") String id2) {
 
         Users utilisateur = usersR.findById(id).get();
 
@@ -819,7 +819,7 @@ public class controller {
 
         utilisateur.addCommande(newCommande);
 
-        Client client = clientR.findById(id_).get();
+        Client client = clientR.findById(id2).get();
         c.setNomC(client.getName());
         client.ajouterCommande(newCommande);
         clientR.save(client);

@@ -24,7 +24,7 @@ public class Commande implements Serializable {
     public String date;
     public double montant;
 
-    public long idC;
+    public String idC;
     public String nomC;
 
     public String description;
