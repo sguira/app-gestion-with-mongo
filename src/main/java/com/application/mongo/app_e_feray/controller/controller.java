@@ -340,9 +340,10 @@ public class controller {
                 return new ResponseEntity<Produit>(pr.save(prod), HttpStatus.CREATED);
             }
         }
-        cat.ajouterProduit(p);
+        Produit produit = pr.save(p);
+        cat.ajouterProduit(produit);
         catR.save(cat);
-        return new ResponseEntity<Produit>(pr.save(p), HttpStatus.CREATED);
+        return new ResponseEntity<Produit>(produit, HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/update_article/{id}/{id_}")
@@ -525,8 +526,11 @@ public class controller {
         if (!id_.equals("-1")) {
             Users u = usersR.findById(id).get();
             Fournisseur f = fournisseurRepo.findById(id_).get();
-
+            String val = a.getDate() + a.getDesignation() + a.getEspece();
+            String remboursement = a.getDate() + a.getEspece();
+            a.addAchat(remboursement);
             a.setNomFournisseur(f.getName());
+            a.getArticles_().add(val);
             u.ajouter_achats(a_);
             usersR.save(u);
 

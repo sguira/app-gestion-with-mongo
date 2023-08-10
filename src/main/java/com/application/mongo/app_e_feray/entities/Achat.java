@@ -2,6 +2,8 @@ package com.application.mongo.app_e_feray.entities;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,5 +26,13 @@ public class Achat implements Serializable {
     private String Date;
     private Double espece;
     private String nomFournisseur;
+
+    private List<String> articles_ = new ArrayList<>();
+
+    private List<String> remboursement = new ArrayList<>();
+
+    public void addAchat(String item) {
+        this.remboursement.add(0, item);
+    }
 
 }
