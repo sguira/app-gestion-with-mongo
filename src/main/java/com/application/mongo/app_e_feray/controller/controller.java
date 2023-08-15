@@ -530,7 +530,7 @@ public class controller {
             String remboursement = a.getDate() + a.getEspece();
             a.addAchat(remboursement);
             a.setNomFournisseur(f.getName());
-            // a.setArticles_();;
+
             u.ajouter_achats(a_);
             usersR.save(u);
 

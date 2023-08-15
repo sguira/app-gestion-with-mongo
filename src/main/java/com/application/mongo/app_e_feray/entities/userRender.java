@@ -18,8 +18,8 @@ public class userRender implements Serializable {
     public String email;
     public String number;
     public InfoEntreprise info;
-    public String dateFin;
-    public String dateDebut;
+    public String dateAbonnement;
+    public String finAbonnement;
     public String numeroCompte;
 
 }
