@@ -209,7 +209,7 @@ public class controller {
 
         Users u = usersR.findById(id).get();
         userRender u_ = new userRender(u.getId(), u.getName(), u.getEmail(), u.getNumber(), u.getInfo(),
-                u.getFinAbonnement(), u.getDateAbonnement(), u.getNumeroCompte());
+                u.getDateAbonnement(), u.getFinAbonnement(), u.getNumeroCompte());
 
         return new ResponseEntity<userRender>(u_, HttpStatus.OK);
     }
