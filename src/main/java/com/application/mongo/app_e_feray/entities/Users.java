@@ -85,7 +85,7 @@ public class Users {
     }
 
     public void ajouter_ventes(ventes v) {
-        this.ventes.add(v);
+        this.ventes.add(0, v);
     }
 
     public void ajouter_achats(Achat a) {

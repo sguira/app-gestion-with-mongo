@@ -35,9 +35,10 @@ public class ventes implements Serializable {
     private Double espece;
     private String numeroCommande;
     private String nomClient;
+    private String typeOperation;
     private String typePayement = "espece";
     private String numeroCompte = "espece";
-
+    private String designation = "vente d'article";
     private List<String> articles_ = new ArrayList<>();
 
     private List<String> remboursement = new ArrayList<>();

@@ -34,7 +34,7 @@ public class Client implements Serializable {
     List<Commande> commandes = new ArrayList<>();
 
     public void ajouter_ventes(ventes v) {
-        ventes.add(v);
+        ventes.add(0, v);
     }
 
     public void ajouterCommande(Commande c) {

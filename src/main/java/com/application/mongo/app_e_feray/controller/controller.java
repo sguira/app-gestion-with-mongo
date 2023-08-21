@@ -436,7 +436,6 @@ public class controller {
     int deletecategorie(@PathVariable String id) throws Exception {
         try {
             catR.deleteById(id);
-            ;
             return 1;
         } catch (Exception e) {
             e.printStackTrace();
@@ -465,6 +464,16 @@ public class controller {
         catR.save(cat);
 
         return new ResponseEntity<>(p_, HttpStatus.CREATED);
+    }
+
+    @PutMapping(value = "/update_categorie/{id}/{name}/{description}")
+    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "name") String name,
+            @PathVariable(name = "description") String description, @PathVariable(name = "id") String id) {
+        Categorie cat = catR.findById(id).get();
+        cat.setName(name);
+        cat.setDescription(description);
+        return new ResponseEntity<Categorie>(catR.save(cat), HttpStatus.OK);
+
     }
 
     @GetMapping(path = "/get_client/{id}")
@@ -522,15 +531,15 @@ public class controller {
     ResponseEntity<Achat> ajouter_depense(@PathVariable(name = "id_1") String id,
             @PathVariable(name = "id_2") String id_,
             @RequestBody Achat a) {
-        Achat a_ = achatR.save(a);
+
         if (!id_.equals("-1")) {
             Users u = usersR.findById(id).get();
             Fournisseur f = fournisseurRepo.findById(id_).get();
             String val = a.getDate() + a.getDesignation() + a.getEspece();
-            String remboursement = a.getDate() + a.getEspece();
+            String remboursement = a.getDate() + "," + a.getEspece();
             a.addAchat(remboursement);
             a.setNomFournisseur(f.getName());
-
+            Achat a_ = achatR.save(a);
             u.ajouter_achats(a_);
             usersR.save(u);
 
@@ -540,6 +549,7 @@ public class controller {
         } else {
             Users u = usersR.findById(id).get();
             a.setNomFournisseur("Inconnu");
+            Achat a_ = achatR.save(a);
             u.ajouter_achats(a_);
             usersR.save(u);
             return new ResponseEntity<Achat>(achatR.save(a), HttpStatus.CREATED);
@@ -840,12 +850,10 @@ public class controller {
             }
         }
 
-        Commande newCommande = commandeRepo.save(c);
-
-        utilisateur.addCommande(newCommande);
-
         Client client = clientR.findById(id2).get();
         c.setNomC(client.getName());
+        Commande newCommande = commandeRepo.save(c);
+        utilisateur.addCommande(newCommande);
         client.ajouterCommande(newCommande);
         clientR.save(client);
         usersR.save(utilisateur);
@@ -856,15 +864,7 @@ public class controller {
     ResponseEntity<List<Commande>> getCommandeByUser(@PathVariable String id) {
         Users u = usersR.findById(id).get();
         List<Commande> commandes = new ArrayList<>();
-        // if (u.getClients().size() > 0) {
-        // u.getClients().forEach(e -> {
-        // e.getCommandes().forEach(c -> {
-        // if (c.getRef() != null) {
-        // commandes.add(c);
-        // }
-        // });
-        // });
-        // }
+
         commandes = u.getCommande();
         return new ResponseEntity<List<Commande>>(commandes, HttpStatus.OK);
     }
@@ -1016,19 +1016,59 @@ public class controller {
         }
     }
 
-    @GetMapping(path = "get_vente_by_id/{id}")
-    ResponseEntity<ventes> getSingleVente(@PathVariable String id) {
-        return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+    @GetMapping(path = "get_vente_by_id/{id}/{choice}")
+    ResponseEntity<?> getSingleVente(@PathVariable String id, @PathVariable(name = "choice") int choice)
+            throws Exception {
+        switch (choice) {
+            case 1: {
+                return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+            }
+            case 2: {
+                return new ResponseEntity<Achat>(achatR.findById(id).get(), HttpStatus.OK);
+            }
+            default:
+                return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+        }
     }
 
-    @PostMapping(path = "update_ventes/{id}/{montant}/{date}")
-    ResponseEntity<ventes> updateVente(@PathVariable(name = "id") String id,
+    @PostMapping(path = "update_ventes/{id}/{montant}/{date}/{choice}")
+    ResponseEntity<?> updateVente(@PathVariable(name = "id") String id,
+            @PathVariable(name = "montant") double montant, @PathVariable(name = "date") String date,
+            @PathVariable int choice) {
+        switch (choice) {
+            case 1: {
+                String val = montant + "," + date;
+                ventes ventes = venteRepo.findById(id).get();
+                ventes.setEspece(ventes.getEspece() + montant);
+                ventes.addVentes(val);
+                return new ResponseEntity<ventes>(venteRepo.save(ventes), HttpStatus.CREATED);
+            }
+            case 2: {
+                String val = montant + "," + date;
+                Achat achat = achatR.findById(id).get();
+                achat.setEspece(achat.getEspece() + montant);
+                achat.addAchat(val);
+                return new ResponseEntity<Achat>(achatR.save(achat), HttpStatus.CREATED);
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    @PostMapping(path = "update_achats/{id}/{montant}/{date}")
+    ResponseEntity<Achat> updateAchat(@PathVariable(name = "id") String id,
             @PathVariable(name = "montant") double montant, @PathVariable(name = "date") String date) {
         String val = montant + "," + date;
-        ventes ventes = venteRepo.findById(id).get();
-        ventes.setEspece(ventes.getEspece() + montant);
-        ventes.addVentes(val);
-        return new ResponseEntity<ventes>(venteRepo.save(ventes), HttpStatus.CREATED);
+        Achat achat = achatR.findById(id).get();
+        achat.setEspece(achat.getEspece() + montant);
+        achat.addAchat(val);
+        return new ResponseEntity<Achat>(achatR.save(achat), HttpStatus.CREATED);
+    }
+
+    @GetMapping(path = "get_achat_by_id/{id}")
+    ResponseEntity<Achat> getSingleAchat(@PathVariable String id) {
+        return new ResponseEntity<Achat>(achatR.findById(id).get(), HttpStatus.OK);
     }
 
     @GetMapping(path = "vente_client/{id}")
