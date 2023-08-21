@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.ToString.Exclude;
 
 @Document()
 @Data
@@ -33,6 +34,7 @@ public class Users {
 
     private String email;
 
+    @Exclude
     private String password;
     private String image_url;
     private InfoEntreprise info;
