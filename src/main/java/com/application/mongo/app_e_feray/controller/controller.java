@@ -385,7 +385,7 @@ public class controller {
     ResponseEntity<ventes> ajouter_ventes(@RequestBody ventes v, @PathVariable(name = "id_user") String id_1,
             @PathVariable(name = "id_clients") String id_2) {
         Users u = usersR.findById(id_1).get();
-        String item = v.getPrix() + "," + v.getDate();
+        String item = v.getEspece() + "," + v.getDate();
         v.addVentes(item);
         Commande commande = new Commande();
         v.getArticles_().forEach((article) -> {
@@ -914,6 +914,12 @@ public class controller {
             annee.add(0, montant);
         }
         return new ResponseEntity<>(annee, HttpStatus.OK);
+    }
+
+    // get client by id
+    @GetMapping(path = "/get_client_by_id/{id}")
+    ResponseEntity<Client> client(@PathVariable String id) {
+        return new ResponseEntity<Client>(clientR.findById(id).get(), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete_fournisseur/{id}/{idF}")

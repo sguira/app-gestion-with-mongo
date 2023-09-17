@@ -22,5 +22,6 @@ public class Abonnement {
     private String finAbonnement;
     // private int jourRestant = 30;
     private int duree;
+    private int prix;
 
 }
