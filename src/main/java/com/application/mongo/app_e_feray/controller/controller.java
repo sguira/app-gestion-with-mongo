@@ -145,7 +145,8 @@ public class controller {
             @RequestParam(name = "image") MultipartFile image,
             @RequestParam(name = "entreprise") String n_en,
             @RequestParam(name = "addresse") String addrese,
-            @RequestParam(name = "num") String num) {
+            @RequestParam(name = "num") String num,
+            @RequestParam(name = "codeCnn") String codeCnn) {
 
         Users users = new Users();
         users.setName(name);
@@ -153,7 +154,7 @@ public class controller {
         users.setNumber(number);
         users.setPassword(password);
         users.setImage_url(image.getOriginalFilename());
-        InfoEntreprise info = new InfoEntreprise(n_en, num, addrese, image.getOriginalFilename());
+        InfoEntreprise info = new InfoEntreprise(n_en, num, addrese, image.getOriginalFilename(), codeCnn);
         System.out.println("info info:" + info.getName());
         users.setInfo(info);
         try {
@@ -218,17 +219,23 @@ public class controller {
     String login(@RequestBody Users u) {
 
         List<Users> result = usersR.findAll();
+        // for (var i : result) {
+        // System.out.println(i.getEmail() + "\n\n");
+        // }
         for (int i = 0; i < result.size(); i++) {
-
+            System.out
+                    .println("\n\n email" + result.get(i).getEmail() + " password recu:" + u.getPassword()
+                            + "==password" +
+                            result.get(i).getPassword());
             if (result.get(i).getEmail().equals(u.getEmail()) &&
                     result.get(i).getPassword().equals(u.getPassword())) {
+                // System.out.println("\n\n" + result.get(i).getEmail());
                 return result.get(i).getId();
             } else if (result.get(i).getRecuperation() != null) {
+                // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).getEmail().equals(u.getEmail()) &&
                         result.get(i).getRecuperation().equals(u.getPassword())) {
                     return "-2";
-                } else {
-                    return "-1";
                 }
 
             }

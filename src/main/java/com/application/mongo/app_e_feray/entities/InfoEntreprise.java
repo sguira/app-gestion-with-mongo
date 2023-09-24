@@ -16,5 +16,7 @@ public class InfoEntreprise implements Serializable {
     String name;
     String telephone;
     String addresse;
+
     String logo;
+    String codeCnn;
 }
