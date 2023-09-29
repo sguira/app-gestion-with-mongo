@@ -223,10 +223,7 @@ public class controller {
         // System.out.println(i.getEmail() + "\n\n");
         // }
         for (int i = 0; i < result.size(); i++) {
-            System.out
-                    .println("\n\n email" + result.get(i).getEmail() + " password recu:" + u.getPassword()
-                            + "==password" +
-                            result.get(i).getPassword());
+
             if (result.get(i).getEmail().equals(u.getEmail()) &&
                     result.get(i).getPassword().equals(u.getPassword())) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
@@ -762,14 +759,21 @@ public class controller {
 
     @PostMapping(path = "/add_tache/{id}")
     ResponseEntity<Tache> add_tache(@PathVariable(name = "id") String id, @RequestBody Tache t) {
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
         System.out.println("\n\ntaches: \n" + t);
 
         Users u = usersR.findById(id).get();
         Tache tache = tacheR.save(t);
         u.ajouter_tache(tache);
         usersR.save(u);
-        return new ResponseEntity<Tache>(tache, HttpStatus.CREATED);
+        return new ResponseEntity<>(tache, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(path = "/deleteTache/{id}")
+    ResponseEntity<?> deleteTache(@PathVariable String id) {
+        System.out.println("Identifiant:" + id + "\n\n");
+        tacheR.deleteById(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping(path = "/find_days/{id}/{date}")
