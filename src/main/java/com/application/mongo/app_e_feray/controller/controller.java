@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -109,6 +110,17 @@ public class controller {
             return "erreur";
         }
 
+    }
+
+    @PostMapping(path = "/updatePassword/{id}")
+    ResponseEntity<String> updatePassword(@PathVariable String id, @RequestBody Map<String, String> body) {
+        Users user = usersR.findById(id).get();
+        if (user.getPassword().equals(body.get("hold"))) {
+            user.setPassword(body.get("password"));
+            usersR.save(user);
+            return new ResponseEntity<>("OK", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("ERROR", HttpStatus.OK);
     }
 
     @PostMapping(path = "/adduser")
