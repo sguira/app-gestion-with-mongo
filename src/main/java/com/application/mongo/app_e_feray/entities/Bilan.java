@@ -15,5 +15,7 @@ public class Bilan implements Serializable {
     public Double paye_vente;
     public Double montant_achat;
     public Double paye_achat;
+    public Double rentree;
+    public Double depense;
 
 }

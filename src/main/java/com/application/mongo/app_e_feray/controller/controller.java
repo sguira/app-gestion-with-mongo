@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -523,22 +522,39 @@ public class controller {
         double vente = 0;
         double payeV = 0;
         double payeA = 0;
+        double rentree = 0;
+        double depense = 0;
         for (var element : u.getAchats()) {
             if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
-                achat += element.getMontant();
-                payeA += element.getEspece();
-                bilan.setMontant_achat(achat);
-                bilan.setPaye_achat(payeA);
+                if (element.getTypeOperation().equals("DEPENSE")) {
+                    depense += element.getEspece();
+                } else {
+
+                    achat += element.getMontant();
+                    payeA += element.getEspece();
+                }
+
             }
         }
         for (var element : u.getVentes()) {
             if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
-                vente += element.getPrix();
-                payeV += element.getEspece();
-                bilan.setMontant_vente(vente);
-                bilan.setPaye_vente(payeV);
+                if (!element.getTypeOperation().equals("RENTREE")) {
+                    vente += element.getPrix();
+                    payeV += element.getEspece();
+
+                } else {
+
+                    rentree += element.getEspece();
+                }
+
             }
         }
+        bilan.setMontant_achat(achat);
+        bilan.setPaye_achat(payeA);
+        bilan.setMontant_vente(vente);
+        bilan.setPaye_vente(payeV);
+        bilan.setDepense(depense);
+        bilan.setRentree(rentree);
 
         return new ResponseEntity<Bilan>(bilan, HttpStatus.OK);
     }
