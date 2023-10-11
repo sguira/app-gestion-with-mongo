@@ -1,4 +1,4 @@
-package com.application.mongo.app_e_feray.Email;
+package com.application.mongo.app_e_feray.email;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

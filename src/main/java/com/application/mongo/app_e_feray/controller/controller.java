@@ -2,11 +2,6 @@ package com.application.mongo.app_e_feray.controller;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 
 import java.util.List;
@@ -30,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.application.mongo.app_e_feray.Email.BodyEmail;
-import com.application.mongo.app_e_feray.Email.EmailServiceImp;
+import com.application.mongo.app_e_feray.email.BodyEmail;
+import com.application.mongo.app_e_feray.email.EmailServiceImp;
 import com.application.mongo.app_e_feray.entities.Abonnement;
 import com.application.mongo.app_e_feray.entities.Achat;
 import com.application.mongo.app_e_feray.entities.Bilan;
@@ -526,25 +521,30 @@ public class controller {
         double depense = 0;
         for (var element : u.getAchats()) {
             if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
-                if (element.getTypeOperation().equals("DEPENSE")) {
-                    depense += element.getEspece();
-                } else {
+                if (element.getTypeOperation() != null) {
+                    if (element.getTypeOperation().equals("DEPENSE")) {
+                        depense += element.getEspece();
+                    } else {
 
-                    achat += element.getMontant();
-                    payeA += element.getEspece();
+                        achat += element.getMontant();
+                        payeA += element.getEspece();
+                    }
+
                 }
 
             }
         }
         for (var element : u.getVentes()) {
             if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
-                if (!element.getTypeOperation().equals("RENTREE")) {
-                    vente += element.getPrix();
-                    payeV += element.getEspece();
+                if (element.getTypeOperation() != null) {
+                    if (!element.getTypeOperation().equals("RENTREE")) {
+                        vente += element.getPrix();
+                        payeV += element.getEspece();
+                    } else {
 
-                } else {
+                        rentree += element.getEspece();
+                    }
 
-                    rentree += element.getEspece();
                 }
 
             }

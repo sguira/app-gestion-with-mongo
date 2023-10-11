@@ -1,8 +1,6 @@
-package com.application.mongo.app_e_feray.Email;
+package com.application.mongo.app_e_feray.email;
 
 import java.io.File;
-
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
