@@ -628,7 +628,7 @@ public class controller {
     }
 
     // supprimer une commande
-    @DeleteMapping(path = "deleteCommande{id_user}/{id_comande}")
+    @DeleteMapping(path = "deleteCommande/{id_user}/{id_comande}")
     ResponseEntity<?> deleteCommande(@PathVariable(name = "id_user") String idUser,
             @PathVariable(name = "id_user") String idCommande) {
         try {
