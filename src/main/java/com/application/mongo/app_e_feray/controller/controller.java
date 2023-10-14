@@ -627,6 +627,19 @@ public class controller {
         return -1;
     }
 
+    // supprimer une commande
+    @DeleteMapping(path = "deleteCommande{id_user}/{id_comande}")
+    ResponseEntity<?> deleteCommande(@PathVariable(name = "id_user") String idUser,
+            @PathVariable(name = "id_user") String idCommande) {
+        try {
+            Users user = usersR.findById(idUser).get();
+            commandeRepo.deleteById(idCommande);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping(path = "/get_ventes_journaliere/{id}/{choice}/{date1}/{date2}/{date3}/{date4}/{date5}/{date6}/{date7}")
     List<Double> ventes_journaliere(@PathVariable(name = "id") String id,
             @PathVariable(name = "date1") String date1,
