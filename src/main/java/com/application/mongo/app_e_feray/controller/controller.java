@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -640,6 +641,34 @@ public class controller {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(path = "vente_semaine_2/{id}/{date}")
+    ResponseEntity<List<Double>> getVenteSemaine2(@PathVariable(name = "id") String id,
+            @PathVariable(name = "date") String date) {
+        List<Double> montant = new ArrayList<Double>();
+        Users u = usersR.findById(id).get();
+        String[] date_ = date.split(",");
+        for (var d : date_) {
+            double montantT = 0;
+            for (var v : u.getVentes()) {
+                if (v.getDate().equals(d)) {
+                    montantT = v.getPrix();
+                }
+            }
+            montant.add(montantT);
+        }
+        for (var d : date_) {
+            double montantI = 0;
+            for (var a : u.getAchats()) {
+                if (a.getDate().equals(d)) {
+                    montantI = a.getMontant();
+                }
+            }
+            montant.add(montantI);
+        }
+
+        return new ResponseEntity<List<Double>>(montant, HttpStatus.OK);
     }
 
     @GetMapping(path = "/get_ventes_journaliere/{id}/{choice}/{date1}/{date2}/{date3}/{date4}/{date5}/{date6}/{date7}")
