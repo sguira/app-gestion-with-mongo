@@ -477,13 +477,21 @@ public class controller {
         return new ResponseEntity<>(p_, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/update_categorie/{id}/{name}/{description}")
-    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "name") String name,
-            @PathVariable(name = "description") String description, @PathVariable(name = "id") String id) {
-        Categorie cat = catR.findById(id).get();
-        cat.setName(name);
-        cat.setDescription(description);
-        return new ResponseEntity<Categorie>(catR.save(cat), HttpStatus.OK);
+    @PutMapping(value = "/update_categorie/{id}")
+    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "id") String id, @RequestBody Categorie cat_) {
+        try {
+            Users u = usersR.findById(id).get();
+
+            Categorie cat = catR.findById(cat_.getId()).get();
+            cat.setName(cat_.getName());
+            cat.setDescription(cat_.getDescription());
+
+            return new ResponseEntity<Categorie>(catR.save(cat), HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("error" + e);
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
 
     }
 
