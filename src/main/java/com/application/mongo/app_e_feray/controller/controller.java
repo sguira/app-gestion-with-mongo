@@ -662,7 +662,7 @@ public class controller {
             double montantT = 0;
             for (var v : u.getVentes()) {
                 if (v.getDate().equals(d)) {
-                    montantT = v.getEspece();
+                    montantT+ = v.getEspece();
                 }
             }
             montant.add(montantT);
@@ -671,7 +671,7 @@ public class controller {
             double montantI = 0;
             for (var a : u.getAchats()) {
                 if (a.getDate().equals(d)) {
-                    montantI = a.getEspece();
+                    montantI += a.getEspece();
                 }
             }
             montant.add(montantI);
