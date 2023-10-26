@@ -478,7 +478,8 @@ public class controller {
     }
 
     @PutMapping(value = "/update_categorie/{id}")
-    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "id") String id, @RequestBody Categorie cat_) {
+    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "id") String id, @RequestBody Categorie cat_)
+            throws Exception {
         try {
             Users u = usersR.findById(id).get();
 
@@ -577,7 +578,7 @@ public class controller {
             Users u = usersR.findById(id).get();
             Fournisseur f = fournisseurRepo.findById(id_).get();
             String val = a.getDate() + a.getDesignation() + a.getEspece();
-            String remboursement = a.getDate() + "," + a.getEspece();
+            String remboursement = a.getEspece() + "," + a.getDate();
             a.addAchat(remboursement);
             a.setNomFournisseur(f.getName());
             Achat a_ = achatR.save(a);
