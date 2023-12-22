@@ -33,6 +33,8 @@ public class Users {
     private String number;
 
     private String email;
+    private String confirmCode = null;
+    private boolean confirmed = false;
 
     @Exclude
     private String password;

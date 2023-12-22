@@ -6,12 +6,14 @@ import java.util.ArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -92,7 +94,7 @@ public class controller {
     @Autowired(required = true)
     AbonnementR abonnement;
 
-    @Autowired(required = true)
+    @Autowired
     EmailServiceImp emailService = new EmailServiceImp();
 
     @PostMapping(path = "/sendMail")
@@ -118,19 +120,52 @@ public class controller {
         return new ResponseEntity<>("ERROR", HttpStatus.OK);
     }
 
+    String generateCode() {
+        Random rand = new Random();
+        String numero = "0123456789";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < 6; i++) {
+            int val = rand.nextInt(numero.length());
+            stringBuilder.append(numero.charAt(val));
+        }
+        return stringBuilder.toString();
+
+    }
+
+    String creerHtmlBody(Users users, String code) {
+        String body = "";
+        body += "<!DOCTYPE>+<html>";
+        body += "<body>";
+        body += "<h1 style='background:red;font-color:white;justify-content:center;border-radius:16px;padding:auto 12px;'>Création de Compte sur E-FERRAY</h1>";
+        body += "<p>Merci d'avoir crée votre compte sur l'application E-ferray.</p>";
+        body += "<p> Cette application vous permettra de gérer la totalité des opérations de votre Entreprise.";
+        body += "<p> Veuillez confirmer votre compte avec ce code:<u>" + code + "</u></p>";
+        body += "</body></html>";
+
+        return body;
+    }
+
     @PostMapping(path = "/adduser")
     ResponseEntity<Users> ajouterUtilisateur(@RequestBody Users u) {
 
         if (!verifier.addUsers(usersR.findAll(), u.getEmail())) {
+            u.setConfirmCode(generateCode());
+
             BodyEmail email = new BodyEmail();
+            // email.setRecipient(u.getEmail());
+            // email.setBody("Création de compte");
+            // email.setMessage(
+            // "Bienvenue sur Notre application\nVotre Compte a bien été crée avec les
+            // coordonnées suivante.\nNom:"
+            // + u.getName() + "\tEmail:" + u.getEmail() +
+            // "\t\u001B31 Nom entreprise:" + u.getInfo().getName() + "\tAddresse:"
+            // + u.getInfo().getAddresse() + "");
+            // // email.setRecipient(u.getEmail());
+            // // email.setBody("Création de compte");
             email.setRecipient(u.getEmail());
             email.setBody("Création de compte");
-            email.setMessage(
-                    "Bienvenue sur Notre application\nVotre Compte a bien été crée avec les coordonnées suivante.\nNom:"
-                            + u.getName() + "\tEmail:" + u.getEmail() +
-                            "\t\u001B31 Nom entreprise:" + u.getInfo().getName() + "\tAddresse:"
-                            + u.getInfo().getAddresse());
-            String res = emailService.sendSimpleMessage(email);
+            String res = emailService.sendHtlmlMail(email, creerHtmlBody(u, generateCode()));
             System.out.println(res);
             if (res.equals("Mail Sent Successfully...")) {
                 return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
@@ -184,6 +219,60 @@ public class controller {
 
     }
 
+    @PostMapping(path = "confirmation-compte/{email}/{code}")
+    String confirmationCreation(@PathVariable(name = "email") String email, @PathVariable(name = "code") String code) {
+        List<Users> users = usersR.findAll();
+        for (var u : users) {
+            if (u.getEmail().equals(email) && u.getConfirmCode().equals(code)) {
+                u.setConfirmed(true);
+                u.setCode("");
+                usersR.save(u);
+                return "OK";
+            }
+        }
+        return "INCORRECT";
+    }
+
+    @GetMapping(path = "reset-code/{email}")
+    ResponseEntity<String> sendCodeMail(@PathVariable(name = "email") String email) {
+        List<Users> users = usersR.findAll();
+        for (var u : users) {
+            if (email.equals(u.getEmail())) {
+                BodyEmail emailBody = new BodyEmail();
+                String code = resetCode(email);
+                if (code != null) {
+                    emailBody.setRecipient(email);
+                    emailBody.setBody("Code de confirmation de Compte sur E-Ferray");
+                    emailBody.setMessage(
+                            "Ce Message est le code de confirmation de la création de votre compte sur Eferray. \n code:"
+                                    + code);
+                    emailService.sendSimpleMessage(emailBody);
+                    u.setConfirmCode(code);
+                    u.setConfirmed(true);
+                    usersR.save(u);
+                    return new ResponseEntity<String>("OK", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
+                }
+
+            }
+        }
+        return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
+    }
+
+    @Transactional
+    String resetCode(String email) {
+        for (var user : usersR.findAll()) {
+            if (user.getEmail().equals(email)) {
+                String code = generateCode();
+                user.setConfirmCode(code);
+                // usersR.save(user);
+                return code;
+            }
+        }
+        return null;
+    }
+
     @GetMapping(path = "users")
     ResponseEntity<List<Users>> alluser() {
         return new ResponseEntity<List<Users>>(usersR.findAll(), HttpStatus.OK);
@@ -196,10 +285,12 @@ public class controller {
         List<Categorie> cats = (List<Categorie>) (u.getCategories());
         if (cats.size() > 0) {
             for (int i = 0; i < cats.size(); i++) {
-                if (cats.get(i).getName() != null) {
-                    if (cats.get(i).getName().equals(cat.getName())) {
-                        System.out.println(" CONFLICT >>>>>>>>>>>>> ");
-                        return new ResponseEntity<>(HttpStatus.CONFLICT);
+                if (cats.get(i) != null) {
+                    if (cats.get(i).getName() != null) {
+                        if (cats.get(i).getName().equals(cat.getName())) {
+                            System.out.println(" CONFLICT >>>>>>>>>>>>> ");
+                            return new ResponseEntity<>(HttpStatus.CONFLICT);
+                        }
                     }
                 }
             }
@@ -234,7 +325,11 @@ public class controller {
             if (result.get(i).getEmail().equals(u.getEmail()) &&
                     result.get(i).getPassword().equals(u.getPassword())) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
-                return result.get(i).getId();
+                if (result.get(i).isConfirmed()) {
+                    return result.get(i).getId();
+                } else {
+                    return "-3";
+                }
             } else if (result.get(i).getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).getEmail().equals(u.getEmail()) &&

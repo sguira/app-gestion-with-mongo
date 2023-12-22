@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailServiceImp implements interfaceSendMail {
@@ -47,6 +48,25 @@ public class EmailServiceImp implements interfaceSendMail {
             e.printStackTrace();
             return "Error while Sending Mail";
         }
+    }
+
+    public String sendHtlmlMail(BodyEmail email, String htmlBody) {
+
+        MimeMessage minMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper;
+        try {
+            mimeMessageHelper = new MimeMessageHelper(minMessage, true, "UTF-8");
+            mimeMessageHelper.setTo(email.recipient);
+            mimeMessageHelper.setFrom(sender);
+            mimeMessageHelper.setText(htmlBody, true);
+            // mimeMessageHelper.setBcc(email.body);
+            javaMailSender.send(minMessage);
+            return "Mail Sent Successfully...";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error while Sending Mail";
+        }
+
     }
 
     // Method 2

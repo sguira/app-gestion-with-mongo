@@ -31,4 +31,7 @@ public interface UserRepositori extends MongoRepository<Users, String> {
     @Query(value = "SELECT date,code,prix FROM ventes V,users_ventes U_V, WHERE V.id=U_V.ventes_id , U_V.users_id = :#{#id} ")
     List<?> all_ventes(@Param("id") Long id);
 
+    @Query(value = "SELECT * from ventes join users where users_id=:#{#id}")
+    Object ventes_by_clients(@Param("id") String id);
+
 }
