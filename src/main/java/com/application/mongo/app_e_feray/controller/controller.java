@@ -135,13 +135,23 @@ public class controller {
 
     String creerHtmlBody(Users users, String code) {
         String body = "";
-        body += "<!DOCTYPE>+<html>";
-        body += "<body>";
-        body += "<h1 style='background:red;font-color:white;justify-content:center;border-radius:16px;padding:auto 12px;'>Création de Compte sur E-FERRAY</h1>";
-        body += "<p>Merci d'avoir crée votre compte sur l'application E-ferray.</p>";
-        body += "<p> Cette application vous permettra de gérer la totalité des opérations de votre Entreprise.";
-        body += "<p> Veuillez confirmer votre compte avec ce code:<u>" + code + "</u></p>";
-        body += "</body></html>";
+        body += "<!DOCTYPE html>" +
+                "<html lang='fr'>" +
+                "<body><div style='margin: 12px auto;max-width: 550px;display: contents;flex-direction: column;flex-wrap: nowrap;'>"
+                +
+                "<div style='background-color: rgb(56, 109, 109);width: 500px;padding: 22px;border-radius: 8px;'>" +
+                "<h2 style='color: white;text-align: center;''>Bienvenue Sur E-Ferray</h2>" +
+                "</div><div style='margin: 22px auto;position:relative;left:20px;'>" +
+                "Félicitation " + users.getName()
+                + " votre compte a été crée avec sucess sur L'application E-Ferray, <br>" +
+                "Pour pouvoir utiliser l'application vous devez d'abord confirmer la création de votre" +
+                "avec le code suivant <u style='color: red;font-size: 26px;'>" + 124578 + "</u>" +
+                "</div><div style='width: 150px;height: 200px;display: contents;justify-content: center;'>" +
+                // "<img
+                // src='http://drive.google.com/uc?export=view&id=1ExYFBFWAFWu-IVaRdgwHf4FWHGcnktYB'
+                // alt='' >" +
+                "<img src='cid:imageId' alt='Logo' >" +
+                "</div>" + "</div></body></html>";
 
         return body;
     }

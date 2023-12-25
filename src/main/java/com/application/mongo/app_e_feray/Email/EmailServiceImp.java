@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 import org.springframework.mail.SimpleMailMessage;
@@ -55,10 +56,12 @@ public class EmailServiceImp implements interfaceSendMail {
         MimeMessage minMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper;
         try {
+            ClassPathResource imagResource = new ClassPathResource("/static/image/lg.png");
             mimeMessageHelper = new MimeMessageHelper(minMessage, true, "UTF-8");
             mimeMessageHelper.setTo(email.recipient);
             mimeMessageHelper.setFrom(sender);
             mimeMessageHelper.setText(htmlBody, true);
+            mimeMessageHelper.addInline("imageId", imagResource);
             // mimeMessageHelper.setBcc(email.body);
             javaMailSender.send(minMessage);
             return "Mail Sent Successfully...";
