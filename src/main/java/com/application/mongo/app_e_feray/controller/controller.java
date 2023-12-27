@@ -133,7 +133,7 @@ public class controller {
 
     }
 
-    String creerHtmlBody(Users users, String code) {
+    String creerHtmlBody(Users users, String message) {
         String body = "";
         body += "<!DOCTYPE html>" +
                 "<html lang='fr'>" +
@@ -142,10 +142,7 @@ public class controller {
                 "<div style='background-color: rgb(56, 109, 109);width: 500px;padding: 22px;border-radius: 8px;'>" +
                 "<h2 style='color: white;text-align: center;''>Bienvenue Sur E-Ferray</h2>" +
                 "</div><div style='margin: 22px auto;position:relative;left:20px;'>" +
-                "Félicitation " + users.getName()
-                + " votre compte a été crée avec sucess sur L'application E-Ferray, <br>" +
-                "Pour pouvoir utiliser l'application vous devez d'abord confirmer la création de votre" +
-                "avec le code suivant <u style='color: red;font-size: 26px;'>" + 124578 + "</u>" +
+                message +
                 "</div><div style='width: 150px;height: 200px;display: contents;justify-content: center;'>" +
                 // "<img
                 // src='http://drive.google.com/uc?export=view&id=1ExYFBFWAFWu-IVaRdgwHf4FWHGcnktYB'
@@ -175,7 +172,11 @@ public class controller {
             // // email.setBody("Création de compte");
             email.setRecipient(u.getEmail());
             email.setBody("Création de compte");
-            String res = emailService.sendHtlmlMail(email, creerHtmlBody(u, generateCode()));
+            String res = emailService.sendHtlmlMail(email, creerHtmlBody(u, "Monsieur/Madame" + u.getName() +
+                    "Veuillez confirmer la création de votre compte sur L'application E-Ferray, <br>" +
+                    "avec le code suivant <u style='color: red;font-size: 26px;'>" + u.getConfirmCode() + "</u>"
+
+            ));
             System.out.println(res);
             if (res.equals("Mail Sent Successfully...")) {
                 return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
@@ -188,46 +189,47 @@ public class controller {
         return new ResponseEntity<Users>(HttpStatus.CONFLICT);
     }
 
-    @PostMapping(path = "/ajouter_user")
-    ResponseEntity<Users> ajouter_utilisateur2(
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "password") String password,
-            @RequestParam(name = "number") String number,
-            @RequestParam(name = "image") MultipartFile image,
-            @RequestParam(name = "entreprise") String n_en,
-            @RequestParam(name = "addresse") String addrese,
-            @RequestParam(name = "num") String num,
-            @RequestParam(name = "codeCnn") String codeCnn) {
+    // @PostMapping(path = "/ajouter_user")
+    // ResponseEntity<Users> ajouter_utilisateur2(
+    // @RequestParam(name = "name") String name,
+    // @RequestParam(name = "email") String email,
+    // @RequestParam(name = "password") String password,
+    // @RequestParam(name = "number") String number,
+    // @RequestParam(name = "image") MultipartFile image,
+    // @RequestParam(name = "entreprise") String n_en,
+    // @RequestParam(name = "addresse") String addrese,
+    // @RequestParam(name = "num") String num,
+    // @RequestParam(name = "codeCnn") String codeCnn) {
 
-        Users users = new Users();
-        users.setName(name);
-        users.setEmail(email);
-        users.setNumber(number);
-        users.setPassword(password);
-        users.setImage_url(image.getOriginalFilename());
-        InfoEntreprise info = new InfoEntreprise(n_en, num, addrese, image.getOriginalFilename(), codeCnn);
-        System.out.println("info info:" + info.getName());
-        users.setInfo(info);
-        try {
-            File ul = new File("D://GESTION CLIENT APP//images//image_profit//",
-                    image.getOriginalFilename());
-            ul.createNewFile();
-            FileOutputStream fout = new FileOutputStream(ul);
-            fout.write(image.getBytes());
-            fout.close();
-        } catch (Exception e) {
-            System.out.print("mon erreru" + e.toString());
-        } finally {
-            if (!verifier.addUsers(usersR.findAll(), email)) {
+    // Users users = new Users();
+    // users.setName(name);
+    // users.setEmail(email);
+    // users.setNumber(number);
+    // users.setPassword(password);
+    // users.setImage_url(image.getOriginalFilename());
+    // InfoEntreprise info = new InfoEntreprise(n_en, num, addrese,
+    // image.getOriginalFilename(), codeCnn);
+    // System.out.println("info info:" + info.getName());
+    // users.setInfo(info);
+    // try {
+    // File ul = new File("D://GESTION CLIENT APP//images//image_profit//",
+    // image.getOriginalFilename());
+    // ul.createNewFile();
+    // FileOutputStream fout = new FileOutputStream(ul);
+    // fout.write(image.getBytes());
+    // fout.close();
+    // } catch (Exception e) {
+    // System.out.print("mon erreru" + e.toString());
+    // } finally {
+    // if (!verifier.addUsers(usersR.findAll(), email)) {
 
-                return new ResponseEntity<>(usersR.save(users), HttpStatus.CREATED);
-            }
+    // return new ResponseEntity<>(usersR.save(users), HttpStatus.CREATED);
+    // }
 
-            return new ResponseEntity<Users>(HttpStatus.CONFLICT);
-        }
+    // return new ResponseEntity<Users>(HttpStatus.CONFLICT);
+    // }
 
-    }
+    // }
 
     @PostMapping(path = "confirmation-compte/{email}/{code}")
     String confirmationCreation(@PathVariable(name = "email") String email, @PathVariable(name = "code") String code) {
@@ -237,7 +239,21 @@ public class controller {
                 u.setConfirmed(true);
                 u.setCode("");
                 usersR.save(u);
-                return "OK";
+                BodyEmail email_ = new BodyEmail();
+                email_.setBody("Compte crée.");
+                email_.setRecipient(email);
+                String res = emailService.sendHtlmlMail(email_, creerHtmlBody(u, "Félicitation, Monsieur/Madame"
+                        + u.getName() +
+                        "Vous pouvez maintenant vous connecter à votre compte sur<br> l'application <u style='color:red;font-size:22px' >E-FERRAY</u>"
+                        +
+                        "Le nom d'utilisateur est votre mail:" + u.getEmail()));
+                System.out.println(res);
+                if (res.equals("Mail Sent Successfully...")) {
+                    return "OK";
+                } else {
+                    return "INCORRECT";
+                }
+
             }
         }
         return "INCORRECT";
