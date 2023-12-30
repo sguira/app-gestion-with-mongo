@@ -26,5 +26,6 @@ public class Produit implements Serializable {
     private int quantite;
     private String reference;
     private int limiteStock = 5;
+    private String unite;
 
 }

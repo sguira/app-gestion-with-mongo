@@ -242,11 +242,11 @@ public class controller {
                 BodyEmail email_ = new BodyEmail();
                 email_.setBody("Compte crée.");
                 email_.setRecipient(email);
-                String res = emailService.sendHtlmlMail(email_, creerHtmlBody(u, "Félicitation, Monsieur/Madame"
+                String res = emailService.sendHtlmlMail(email_, creerHtmlBody(u, "Félicitation, "
                         + u.getName() +
-                        "Vous pouvez maintenant vous connecter à votre compte sur<br> l'application <u style='color:red;font-size:22px' >E-FERRAY</u>"
+                        " Vous pouvez maintenant vous connecter à votre compte sur<br> l'application <u style='color:red;font-size:22px' >E-FERRAY</u>"
                         +
-                        "Le nom d'utilisateur est votre mail:" + u.getEmail()));
+                        "Le nom d'utilisateur est votre mail: " + u.getEmail()));
                 System.out.println(res);
                 if (res.equals("Mail Sent Successfully...")) {
                     return "OK";
