@@ -1,6 +1,7 @@
 package com.application.mongo.app_e_feray.entities;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -25,10 +26,9 @@ public class Commande implements Serializable {
     public double montant;
 
     public String idC;
-    public String nomC;
-
     public String description;
     public boolean terminer;
+    public List<String> descriptions;
 
     // @OneToMany(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
     // public List<ventes> ventes=new ArrayList<ventes>();

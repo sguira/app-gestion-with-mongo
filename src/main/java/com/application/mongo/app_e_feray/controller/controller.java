@@ -1064,7 +1064,7 @@ public class controller {
         }
 
         Client client = clientR.findById(id2).get();
-        c.setNomC(client.getName());
+
         Commande newCommande = commandeRepo.save(c);
         utilisateur.addCommande(newCommande);
         client.ajouterCommande(newCommande);
