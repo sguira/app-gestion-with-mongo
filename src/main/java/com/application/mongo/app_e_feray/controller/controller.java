@@ -921,6 +921,11 @@ public class controller {
         return usersR.ventes_de_la_semaine();
     }
 
+    @GetMapping("/index")
+    public String getMethodName() {
+        return "index";
+    }
+
     @GetMapping(path = "/all_ventes/{id}")
     List<?> all_ventes(@PathVariable(name = "id") Long id) {
         List<?> v = new ArrayList<>();

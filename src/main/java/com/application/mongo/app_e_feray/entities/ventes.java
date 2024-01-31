@@ -9,8 +9,6 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,6 +33,7 @@ public class ventes implements Serializable {
     private String typePayement = "espece";
     private String numeroCompte = "espece";
     private String designation = "vente d'article";
+    private double montantRemise;
     private List<String> articles_ = new ArrayList<>();
 
     private List<String> remboursement = new ArrayList<>();
