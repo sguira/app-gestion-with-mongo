@@ -76,6 +76,9 @@ public class Users {
     @DBRef
     private List<Commande> commande = new ArrayList<>();
 
+    @DBRef
+    private List<Abonnement> abonnements = new ArrayList<>();
+
     public void ajouterCategorie(Categorie cat) {
         this.categories.add(cat);
     }
