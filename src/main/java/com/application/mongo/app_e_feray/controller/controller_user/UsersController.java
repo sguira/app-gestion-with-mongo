@@ -26,7 +26,7 @@ import com.application.mongo.app_e_feray.repository.UserRepositori;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/users/")
+@RequestMapping(path = "/backend/users")
 public class UsersController {
 
     @Autowired(required = true)
