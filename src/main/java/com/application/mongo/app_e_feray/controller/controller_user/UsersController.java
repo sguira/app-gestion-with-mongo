@@ -119,6 +119,7 @@ public class UsersController {
         user.setEmail(u.getEmail());
         user.setLast_name(u.getLast_name());
         user.setNumber(u.getNumber());
+        user.setInfo(u.getInfo());
         user.setPassword(u.getPassword());
         return new ResponseEntity<Users>(usersR.save(user), HttpStatus.CREATED);
 
