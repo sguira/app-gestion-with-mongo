@@ -32,7 +32,7 @@ public class UsersController {
     @Autowired(required = true)
     private UserRepositori usersR;
 
-    @Autowired(required = true)
+    @Autowired
     private EmailServiceImp emailService;
 
     @PostMapping(path = "/updatePassword/{id}")
@@ -120,7 +120,7 @@ public class UsersController {
         user.setLast_name(u.getLast_name());
         user.setNumber(u.getNumber());
         user.setInfo(u.getInfo());
-        user.setPassword(u.getPassword());
+        // user.setPassword(u.getPassword());
         return new ResponseEntity<Users>(usersR.save(user), HttpStatus.CREATED);
 
     }
@@ -208,7 +208,8 @@ public class UsersController {
             u.setSuscription(true);
             u.setDateAbonnement(dateAbonnement);
             u.setFinAbonnement(finAbonnement);
-            return new ResponseEntity<Users>(usersR.save(u), HttpStatus.CREATED);
+
+            return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.CONFLICT);
