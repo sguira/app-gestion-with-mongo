@@ -27,6 +27,7 @@ public class Achat implements Serializable {
     private Double espece;
     private String nomFournisseur;
     private String typeOperation;
+    private double regleInialement;
     private List<String> articles_ = new ArrayList<>();
 
     private List<String> remboursement = new ArrayList<>();

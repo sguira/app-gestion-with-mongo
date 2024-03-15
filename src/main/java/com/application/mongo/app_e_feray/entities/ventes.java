@@ -34,6 +34,7 @@ public class ventes implements Serializable {
     private String numeroCompte = "espece";
     private String designation = "vente d'article";
     private double montantRemise;
+    private double regleInialement;
     private List<String> articles_ = new ArrayList<>();
 
     private List<String> remboursement = new ArrayList<>();
