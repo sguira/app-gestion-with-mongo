@@ -301,6 +301,15 @@ public class controller {
                 if (v.getDate().equals(d)) {
                     montantT += v.getEspece();
                 }
+                for (var e : v.getRemboursement()) {
+                    try {
+                        if (e.toString().split(",")[1].equals(d)) {
+                            montantT += Double.parseDouble(e.toString().split(",")[0]);
+                        }
+                    } catch (Exception ex) {
+
+                    }
+                }
             }
             montant.add(montantT);
         }
@@ -309,6 +318,15 @@ public class controller {
             for (var a : u.getAchats()) {
                 if (a.getDate().equals(d)) {
                     montantI += a.getEspece();
+                }
+                for (var e : a.getRemboursement()) {
+                    try {
+                        if (e.toString().split(",")[1].equals(d)) {
+                            montantI += Double.parseDouble(e.toString().split(",")[0]);
+                        }
+                    } catch (Exception ex) {
+
+                    }
                 }
             }
             montant.add(montantI);
