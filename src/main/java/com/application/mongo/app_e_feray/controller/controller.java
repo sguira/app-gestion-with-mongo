@@ -448,6 +448,11 @@ public class controller {
         return new ResponseEntity(HttpStatus.OK);
     }
 
+    @PutMapping(path = "/updateTache/{id}")
+    ResponseEntity<Tache> modifierTache(@RequestBody Tache tache, @PathVariable String id) throws Exception {
+        return new ResponseEntity<Tache>(tacheR.save(tache), HttpStatus.CREATED);
+    }
+
     @GetMapping(path = "/find_days/{id}/{date}")
     List<Tache> find_days(@PathVariable String id, @PathVariable String date) {
         List<Tache> taches = new ArrayList<>();
