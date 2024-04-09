@@ -31,7 +31,8 @@ public class Achat implements Serializable {
     private String codeFacture;
     private String fournisseurId;
     private List<String> articles_ = new ArrayList<>();
-
+    private double tva = 0;
+    private double montantRemise = 0;
     private List<String> remboursement = new ArrayList<>();
 
     public void addAchat(String item) {
