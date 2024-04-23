@@ -18,9 +18,9 @@ public class Abonnement {
     @Id
     private String id;
     private String label;
-    private String dateAbonnement;
-    private String finAbonnement;
-    private String numero;
+    // private String dateAbonnement;
+    // private String finAbonnement;
+    // private String numero;
     // private int jourRestant = 30;
     private int duree;
     private double prix;

@@ -215,9 +215,9 @@ public class UsersController {
             u.setDateAbonnement(dateAbonnement);
             u.setFinAbonnement(finAbonnement);
             Abonnement abonnement = new Abonnement();
-            abonnement.setDateAbonnement(dateAbonnement);
-            abonnement.setFinAbonnement(finAbonnement);
-            abonnement.setNumero(numero);
+            // abonnement.setDateAbonnement(dateAbonnement);
+            // abonnement.setFinAbonnement(finAbonnement);
+            // abonnement.setNumero(numero);
             abonnement.setPrix(montant);
             // abonnement.setLabel(numero);
             abonnement = abonnementR.save(abonnement);
