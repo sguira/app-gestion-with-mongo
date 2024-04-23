@@ -111,6 +111,10 @@ public class Users {
         this.contacts.add(c);
     }
 
+    public void addAbonnement(Abonnement abonnement) {
+        this.abonnements.add(abonnement);
+    }
+
     public String formatMail() {
         return "Cher client nous vous souhaitons la bienvenue sur notre l'application " +
                 "Vous venez de créer un compte sur l'application E-Guira avec les informations suivantes:" + "\n Nom:"

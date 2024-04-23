@@ -20,8 +20,9 @@ public class Abonnement {
     private String label;
     private String dateAbonnement;
     private String finAbonnement;
+    private String numero;
     // private int jourRestant = 30;
     private int duree;
-    private int prix;
+    private double prix;
 
 }
