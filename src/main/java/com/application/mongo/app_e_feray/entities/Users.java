@@ -36,6 +36,10 @@ public class Users {
     private String confirmCode = null;
     private boolean confirmed = false;
 
+    class Abonnement_ {
+
+    }
+
     @Exclude
     private String password;
     private String image_url;
@@ -77,7 +81,7 @@ public class Users {
     private List<Commande> commande = new ArrayList<>();
 
     @DBRef
-    private List<Abonnement> abonnements = new ArrayList<>();
+    private List<DetailAbonnement> abonnements = new ArrayList<>();
 
     public void ajouterCategorie(Categorie cat) {
         this.categories.add(cat);
@@ -111,7 +115,7 @@ public class Users {
         this.contacts.add(c);
     }
 
-    public void addAbonnement(Abonnement abonnement) {
+    public void addAbonnement(DetailAbonnement abonnement) {
         this.abonnements.add(abonnement);
     }
 

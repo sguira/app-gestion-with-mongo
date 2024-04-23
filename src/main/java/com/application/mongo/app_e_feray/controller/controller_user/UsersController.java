@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.application.mongo.app_e_feray.email.BodyEmail;
 import com.application.mongo.app_e_feray.email.EmailServiceImp;
 import com.application.mongo.app_e_feray.entities.Abonnement;
+import com.application.mongo.app_e_feray.entities.DetailAbonnement;
 import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.entities.userRender;
 import com.application.mongo.app_e_feray.repository.AbonnementR;
+import com.application.mongo.app_e_feray.repository.DetailAbonnementRepo;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 
 @RestController
@@ -39,6 +41,9 @@ public class UsersController {
 
     @Autowired
     private AbonnementR abonnementR;
+
+    @Autowired
+    private DetailAbonnementRepo detailAbonnementR;
 
     @PostMapping(path = "/updatePassword/{id}")
     ResponseEntity<String> updatePassword(@PathVariable String id, @RequestBody Map<String, String> body) {
@@ -203,24 +208,28 @@ public class UsersController {
         return "ERROR";
     }
 
-    @GetMapping(path = "updateSuscription/{id}/{dateDebut}/{dateFin}/{prix}/{number}")
+    @GetMapping(path = "updateSuscription/{id}/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
     ResponseEntity<Users> updatSuscription(@PathVariable String id, @PathVariable(name = "prix") double montant,
             @PathVariable(name = "dateDebut") String dateAbonnement,
             @PathVariable(name = "dateFin") String finAbonnement,
-            @PathVariable(name = "numero") String numero) {
+            @PathVariable(name = "numero") String numero,
+            @PathVariable(name = "duree") int duree
+
+    ) {
         try {
             Users u = usersR.findById(id).get();
             u.setMontantAbonnement(montant);
             u.setSuscription(true);
             u.setDateAbonnement(dateAbonnement);
             u.setFinAbonnement(finAbonnement);
-            Abonnement abonnement = new Abonnement();
-            // abonnement.setDateAbonnement(dateAbonnement);
-            // abonnement.setFinAbonnement(finAbonnement);
-            // abonnement.setNumero(numero);
+            DetailAbonnement abonnement = new DetailAbonnement();
+            abonnement.setDateAbonnement(dateAbonnement);
+            abonnement.setFinAbonnement(finAbonnement);
+            abonnement.setNumero(numero);
             abonnement.setPrix(montant);
+            abonnement.setDuree(duree);
             // abonnement.setLabel(numero);
-            abonnement = abonnementR.save(abonnement);
+            abonnement = detailAbonnementR.save(abonnement);
 
             u.addAbonnement(abonnement);
             return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
