@@ -33,14 +33,14 @@ import com.application.mongo.app_e_feray.repository.UserRepositori;
 @RequestMapping(path = "/backend/users")
 public class UsersController {
 
-    @Autowired(required = true)
+    @Autowired
     private UserRepositori usersR;
 
     @Autowired
     private EmailServiceImp emailService;
 
-    @Autowired
-    private AbonnementR abonnementR;
+    // @Autowired
+    // private AbonnementR abonnementR;
 
     @Autowired
     private DetailAbonnementRepo detailAbonnementR;
@@ -212,7 +212,7 @@ public class UsersController {
     ResponseEntity<Users> updatSuscription(@PathVariable String id, @PathVariable(name = "prix") double montant,
             @PathVariable(name = "dateDebut") String dateAbonnement,
             @PathVariable(name = "dateFin") String finAbonnement,
-            @PathVariable(name = "numero") String numero,
+            @PathVariable(name = "number") String numero,
             @PathVariable(name = "duree") int duree
 
     ) {
@@ -232,8 +232,10 @@ public class UsersController {
             abonnement = detailAbonnementR.save(abonnement);
 
             u.addAbonnement(abonnement);
+            System.out.println("Abonnement");
             return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
         } catch (Exception e) {
+            System.out.println("Erreur abonnement.");
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
