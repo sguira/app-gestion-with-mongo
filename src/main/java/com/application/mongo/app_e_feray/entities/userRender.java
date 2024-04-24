@@ -1,7 +1,7 @@
 package com.application.mongo.app_e_feray.entities;
 
 import java.io.Serializable;
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +18,10 @@ public class userRender implements Serializable {
     public String email;
     public String number;
     public InfoEntreprise info;
+
     public String dateAbonnement;
     public String finAbonnement;
     public String numeroCompte;
+    public List<DetailAbonnement> detailAbonnements;
 
 }
