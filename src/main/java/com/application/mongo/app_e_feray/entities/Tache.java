@@ -21,5 +21,5 @@ public class Tache {
     String description;
     String date_;
     String heure;
-    int etat = 1;
+    int etat2 = 1;
 }
