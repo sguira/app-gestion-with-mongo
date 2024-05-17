@@ -30,7 +30,7 @@ public class Commande implements Serializable {
     public boolean terminer;
     public List<String> descriptions;
     public String dateLivraison = "";
-    public String heureLivraisson = "";
+    public String heureLivraison = "";
     // @OneToMany(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
     // public List<ventes> ventes=new ArrayList<ventes>();
 
