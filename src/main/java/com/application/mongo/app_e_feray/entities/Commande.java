@@ -29,7 +29,8 @@ public class Commande implements Serializable {
     public String description;
     public boolean terminer;
     public List<String> descriptions;
-
+    public String dateLivraison = "";
+    public String heureLivraisson = "";
     // @OneToMany(cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
     // public List<ventes> ventes=new ArrayList<ventes>();
 
