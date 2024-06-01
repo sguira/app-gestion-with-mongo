@@ -36,6 +36,7 @@ public class ventes implements Serializable {
     private double montantRemise = 0;
     private double regleInialement;
     private double tva = 0;
+    private String dateEcheance;
     private List<String> articles_ = new ArrayList<>();
 
     private List<String> remboursement = new ArrayList<>();
