@@ -298,7 +298,7 @@ public class controller {
         for (var d : date_) {
             double montantT = 0;
             for (var v : u.getVentes()) {
-                if (v.getDate().split(" ")[0].equals(d.split(date))) {
+                if (v.getDate().split(" ")[0].equals(d)) {
                     montantT += v.getEspece();
                 }
                 for (var e : v.getRemboursement()) {
