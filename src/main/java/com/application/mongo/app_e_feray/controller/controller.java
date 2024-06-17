@@ -302,31 +302,36 @@ public class controller {
                 if (v.getDate().split(" ")[0].equals(d)) {
                     montantT += v.getEspece();
                 }
-                for (var e : v.getRemboursement()) {
-                    try {
-                        if (e.toString().split(",")[1].split(" ")[0].equals(d)) {
-                            montantT += Double.parseDouble(e.toString().split(",")[0]);
+                if (!v.getRemboursement().isEmpty()) {
+                    for (int i = 1; i < v.getRemboursement().size(); i++) {
+                        try {
+                            if (v.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
+                                montantT += Double.parseDouble(v.getRemboursement().get(i).toString().split(",")[0]);
+                            }
+                        } catch (Exception ex) {
+                            System.out.println("Erreur: " + ex.getMessage());
                         }
-                    } catch (Exception ex) {
-                        System.out.println("Erreur: " + ex.getMessage());
                     }
                 }
+
             }
             montant.add(montantT);
         }
         for (var d : date_) {
             double montantI = 0;
             for (var a : u.getAchats()) {
-                if (a.getDate().equals(d)) {
+                if (a.getDate().split(" ")[0].equals(d)) {
                     montantI += a.getEspece();
                 }
-                for (var e : a.getRemboursement()) {
-                    try {
-                        if (e.toString().split(",")[1].equals(d)) {
-                            montantI += Double.parseDouble(e.toString().split(",")[0]);
-                        }
-                    } catch (Exception ex) {
+                if (!a.getRemboursement().isEmpty()) {
+                    for (var i = 1; i < a.getRemboursement().size(); i++) {
+                        try {
+                            if (a.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
+                                montantI += Double.parseDouble(a.getRemboursement().get(i).toString().split(",")[0]);
+                            }
+                        } catch (Exception ex) {
 
+                        }
                     }
                 }
             }
