@@ -239,7 +239,7 @@ public class controller {
 
                     } else {
 
-                        achat += element.getMontant();
+                        achat += element.getMontant() + element.getTva() - element.getMontantRemise();
                         payeA += element.getEspece();
                         if (element.getRemboursement().size() > 1) {
                             for (var i = 1; i < element.getRemboursement().size(); i++) {
@@ -263,7 +263,7 @@ public class controller {
                 if (element.getTypeOperation() != null) {
                     if (!element.getTypeOperation().equals("RENTREE")) {
                         vente += element.getPrix();
-                        payeV += element.getEspece();
+                        payeV += element.getEspece() + element.getTva() - element.getMontantRemise();
                     } else {
 
                         rentree += element.getEspece();
