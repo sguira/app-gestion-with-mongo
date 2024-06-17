@@ -302,7 +302,7 @@ public class controller {
                 if (v.getDate().split(" ")[0].equals(d)) {
                     montantT += v.getEspece();
                 }
-                if (!v.getRemboursement().isEmpty()) {
+                if (v.getRemboursement().size() > 1) {
                     for (int i = 1; i < v.getRemboursement().size(); i++) {
                         try {
                             if (v.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
@@ -323,7 +323,7 @@ public class controller {
                 if (a.getDate().split(" ")[0].equals(d)) {
                     montantI += a.getEspece();
                 }
-                if (!a.getRemboursement().isEmpty()) {
+                if (a.getRemboursement().size() > 1) {
                     for (var i = 1; i < a.getRemboursement().size(); i++) {
                         try {
                             if (a.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
