@@ -239,8 +239,8 @@ public class controller {
 
                     } else {
 
-                        achat += element.getMontant();
-                        payeA += element.getEspece() + element.getTva() - element.getMontantRemise();
+                        achat += element.getMontant() + element.getTva() - element.getMontantRemise();
+                        payeA += element.getEspece();
                         if (element.getRemboursement().size() > 1) {
                             for (var i = 1; i < element.getRemboursement().size(); i++) {
                                 if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
@@ -262,8 +262,8 @@ public class controller {
                     && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
                 if (element.getTypeOperation() != null) {
                     if (!element.getTypeOperation().equals("RENTREE")) {
-                        vente += element.getPrix();
-                        payeV += element.getEspece() + element.getTva() - element.getMontantRemise();
+                        vente += element.getPrix() + element.getTva() - element.getMontantRemise();
+                        payeV += element.getEspece();
                     } else {
 
                         rentree += element.getEspece();
