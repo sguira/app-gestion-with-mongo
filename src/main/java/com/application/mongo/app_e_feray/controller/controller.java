@@ -223,10 +223,6 @@ public class controller {
             @PathVariable(name = "date1") String date1, @PathVariable(name = "id") String id) {
         Bilan bilan = new Bilan();
 
-        // bilan.setMontant_achat(usersR.get_bilan_achat_montant(date2, date1, id));
-        // bilan.setMontant_vente(usersR.get_bilan_ventes_montant(date2, date1, id));
-        // bilan.setPaye_achat(usersR.get_bilan_achat_paye(date2, date1, id));
-        // bilan.setPaye_vente(usersR.get_bilan_ventes_paye(date2, date1, id));
         Users u = usersR.findById(id).get();
         double achat = 0;
         double vente = 0;
@@ -235,14 +231,26 @@ public class controller {
         double rentree = 0;
         double depense = 0;
         for (var element : u.getAchats()) {
-            if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
+            if (element.getDate().split(" ")[0].compareTo(date1) >= 0
+                    && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
                 if (element.getTypeOperation() != null) {
                     if (element.getTypeOperation().equals("DEPENSE")) {
                         depense += element.getEspece();
+
                     } else {
 
                         achat += element.getMontant();
                         payeA += element.getEspece();
+                        if (element.getRemboursement().size() > 1) {
+                            for (var i = 1; i < element.getRemboursement().size(); i++) {
+                                if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
+                                        && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                .compareTo(date2) <= 0) {
+                                    payeA += Double.parseDouble(element.getRemboursement().get(i).split(",")[0]);
+
+                                }
+                            }
+                        }
                     }
 
                 }
@@ -250,7 +258,8 @@ public class controller {
             }
         }
         for (var element : u.getVentes()) {
-            if (element.getDate().compareTo(date1) >= 0 && element.getDate().compareTo(date2) <= 0) {
+            if (element.getDate().split(" ")[0].compareTo(date1) >= 0
+                    && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
                 if (element.getTypeOperation() != null) {
                     if (!element.getTypeOperation().equals("RENTREE")) {
                         vente += element.getPrix();
@@ -258,6 +267,17 @@ public class controller {
                     } else {
 
                         rentree += element.getEspece();
+
+                        if (element.getRemboursement().size() > 1) {
+                            for (var i = 1; i < element.getRemboursement().size(); i++) {
+                                if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
+                                        && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                .compareTo(date2) <= 0) {
+                                    payeA += Double.parseDouble(element.getRemboursement().get(i).split(",")[0]);
+
+                                }
+                            }
+                        }
                     }
 
                 }
