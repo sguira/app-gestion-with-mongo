@@ -296,6 +296,7 @@ public class controller {
         Users u = usersR.findById(id).get();
         String[] date_ = date.split(",");
         for (var d : date_) {
+            System.out.println("Date: " + d + '\n');
             double montantT = 0;
             for (var v : u.getVentes()) {
                 if (v.getDate().split(" ")[0].equals(d)) {
@@ -303,11 +304,11 @@ public class controller {
                 }
                 for (var e : v.getRemboursement()) {
                     try {
-                        if (e.toString().split(",")[1].equals(d)) {
+                        if (e.toString().split(",")[1].split(" ")[0].equals(d)) {
                             montantT += Double.parseDouble(e.toString().split(",")[0]);
                         }
                     } catch (Exception ex) {
-
+                        System.out.println("Erreur: " + ex.getMessage());
                     }
                 }
             }
