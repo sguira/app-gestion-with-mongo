@@ -241,8 +241,8 @@ public class controller {
 
                         achat += element.getMontant() + element.getTva() - element.getMontantRemise();
                         payeA += element.getEspece();
-                        if (element.getRemboursement().size() > 1) {
-                            for (var i = 1; i < element.getRemboursement().size(); i++) {
+                        if (!element.getRemboursement().isEmpty()) {
+                            for (var i = 0; i < element.getRemboursement().size() - 1; i++) {
                                 if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
                                         && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
                                                 .compareTo(date2) <= 0) {
@@ -268,8 +268,8 @@ public class controller {
 
                         rentree += element.getEspece();
 
-                        if (element.getRemboursement().size() > 1) {
-                            for (var i = 1; i < element.getRemboursement().size(); i++) {
+                        if (!element.getRemboursement().isEmpty()) {
+                            for (var i = 1; i < element.getRemboursement().size() - 1; i++) {
                                 if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
                                         && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
                                                 .compareTo(date2) <= 0) {
@@ -322,8 +322,8 @@ public class controller {
                 if (v.getDate().split(" ")[0].equals(d)) {
                     montantT += v.getEspece();
                 }
-                if (v.getRemboursement().size() > 1) {
-                    for (int i = 1; i < v.getRemboursement().size(); i++) {
+                if (!v.getRemboursement().isEmpty()) {
+                    for (int i = 0; i < v.getRemboursement().size() - 1; i++) {
                         try {
                             if (v.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
                                 montantT += Double.parseDouble(v.getRemboursement().get(i).toString().split(",")[0]);
@@ -343,8 +343,8 @@ public class controller {
                 if (a.getDate().split(" ")[0].equals(d)) {
                     montantI += a.getEspece();
                 }
-                if (a.getRemboursement().size() > 1) {
-                    for (var i = 1; i < a.getRemboursement().size(); i++) {
+                if (!a.getRemboursement().isEmpty()) {
+                    for (var i = 0; i < a.getRemboursement().size() - 1; i++) {
                         try {
                             if (a.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
                                 montantI += Double.parseDouble(a.getRemboursement().get(i).toString().split(",")[0]);
