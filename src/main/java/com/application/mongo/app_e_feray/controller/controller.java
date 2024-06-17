@@ -239,8 +239,8 @@ public class controller {
 
                     } else {
 
-                        achat += element.getMontant() + element.getTva() - element.getMontantRemise();
-                        payeA += element.getEspece();
+                        achat += element.getMontant();
+                        payeA += element.getEspece() + element.getTva() - element.getMontantRemise();
                         if (element.getRemboursement().size() > 1) {
                             for (var i = 1; i < element.getRemboursement().size(); i++) {
                                 if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
