@@ -6,4 +6,6 @@ import com.application.mongo.app_e_feray.entities.Categorie;
 
 public interface CategorieRepositori extends MongoRepository<Categorie, String> {
 
+    // @Query()
+
 }

@@ -23,6 +23,7 @@ import com.application.mongo.app_e_feray.email.EmailServiceImp;
 import com.application.mongo.app_e_feray.entities.Abonnement;
 import com.application.mongo.app_e_feray.entities.DetailAbonnement;
 import com.application.mongo.app_e_feray.entities.Users;
+import com.application.mongo.app_e_feray.entities.VitrineEmail;
 import com.application.mongo.app_e_feray.entities.userRender;
 import com.application.mongo.app_e_feray.repository.AbonnementR;
 import com.application.mongo.app_e_feray.repository.DetailAbonnementRepo;
@@ -165,15 +166,7 @@ public class UsersController {
                     break;
                 }
             }
-            // LocalDateTime now = LocalDateTime.now();
 
-            // String chaine = email + now.toString();
-            // System.out.println("\n\n" + chaine);
-            // StringBuffer recuperation = new StringBuffer();
-            // for (int i = 0; i < chaine.length(); i++) {
-            // int index = (int) (Math.random() * (chaine.length() - 1));
-            // recuperation.append(chaine.charAt(index));
-            // }
             u.setRecuperation(password);
             usersR.save(u);
             BodyEmail body = new BodyEmail();
@@ -208,7 +201,7 @@ public class UsersController {
         return "ERROR";
     }
 
-    @GetMapping(path = "updateSuscription/{id}/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
+    @GetMapping(path = "/updateSuscription/{id}/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
     ResponseEntity<Users> updatSuscription(@PathVariable String id, @PathVariable(name = "prix") double montant,
             @PathVariable(name = "dateDebut") String dateAbonnement,
             @PathVariable(name = "dateFin") String finAbonnement,
@@ -309,7 +302,7 @@ public class UsersController {
         return null;
     }
 
-    @GetMapping(path = "users")
+    @GetMapping(path = "/users")
     ResponseEntity<List<Users>> alluser() {
         return new ResponseEntity<List<Users>>(usersR.findAll(), HttpStatus.OK);
     }
@@ -356,4 +349,39 @@ public class UsersController {
 
         return body;
     }
+
+    // @PostMapping("/backend/")
+    // public ResponseEntity<String> contactByEmailVitrine(RequestBody VitrineEmai
+    // messageBody){
+    // return new ResponseEntity<String>(HttpStatus.OK,"ENVOYER");
+    // }
+
+    @PostMapping("vitrine/contact")
+    public ResponseEntity<String> postMethodName(@RequestBody VitrineEmail entity) {
+
+        try {
+            BodyEmail body = new BodyEmail();
+            body.setBody(entity.getSubject());
+            body.setRecipient("sguira96@gmail.com");
+            body.setMessage(entity.getMessage());
+
+            String envoi = emailService.sendSimpleMessage(body, entity.getEmail());
+            if (envoi == "Mail Sent Successfully...") {
+                return new ResponseEntity<String>("OK", HttpStatus.OK);
+            }
+            return new ResponseEntity<String>("ERROR", HttpStatus.CONFLICT);
+
+        } catch (Exception e) {
+            return new ResponseEntity<String>("ERROR", HttpStatus.CONFLICT);
+        }
+
+    }
+
+    String customMail(VitrineEmail email) {
+        return "<html><body>" +
+                "<h1>Mail Envoyé par: " + email.getName() + " </h>" +
+                "<div>" + email.getMessage() + "</div>" +
+                "</body></html>";
+    }
+
 }
