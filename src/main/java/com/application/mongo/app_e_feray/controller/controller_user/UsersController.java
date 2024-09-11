@@ -67,7 +67,7 @@ public class UsersController {
         for (int i = 0; i < result.size(); i++) {
 
             if (result.get(i).getEmail().equals(u.getEmail()) &&
-                    result.get(i).getPassword().equals(u.getPassword())) {
+                    result.get(i).getPassword().equals(u.getPassword()) && u.getRecuperation().equals("")) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).isConfirmed()) {
                     return result.get(i).getId();
@@ -168,6 +168,7 @@ public class UsersController {
             }
 
             u.setRecuperation(password);
+            u.setPassword("");
             usersR.save(u);
             BodyEmail body = new BodyEmail();
             body.setMessage(
@@ -191,6 +192,7 @@ public class UsersController {
         for (var user : usersR.findAll()) {
             if (user.getEmail().equals(email) && user.getRecuperation().equals(recuperation)) {
                 user.setPassword(password);
+                user.setRecuperation("");
                 usersR.save(user);
                 System.out.println(" \n\nmodifier\n\n");
                 return "OK";
