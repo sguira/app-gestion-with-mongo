@@ -426,7 +426,7 @@ public class UsersController {
     }
 
     // ajouter un article favoris
-    @DeleteMapping(path = "delete_favoris_multiple/{id_user}/{id_article}")
+    @DeleteMapping(path = "delete_favoris/{id_user}/{id_article}")
     ResponseEntity<String> supprimerFav(@PathVariable(name = "id_user") String idUsers,
             @PathVariable(name = "id_article") String id) {
         Users user = usersR.findById(idUsers).get();
