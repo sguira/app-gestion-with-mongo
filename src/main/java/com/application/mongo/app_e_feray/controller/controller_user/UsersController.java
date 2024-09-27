@@ -1,14 +1,17 @@
 package com.application.mongo.app_e_feray.controller.controller_user;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -384,6 +387,67 @@ public class UsersController {
                 "<h1>Mail Envoyé par: " + email.getName() + " </h>" +
                 "<div>" + email.getMessage() + "</div>" +
                 "</body></html>";
+    }
+
+    // ajouter un article favoris
+    @PostMapping(path = "add_favoris/{id_user}/{id_article}")
+    ResponseEntity<String> addArticleFavoris(@PathVariable(name = "id_user") String idUsers,
+            @PathVariable(name = "id_article") String id) {
+        Users user = usersR.findById(idUsers).get();
+        List<String> articlesFreq = new ArrayList<>();
+        boolean exist = false;
+        for (int i = 0; i < articlesFreq.size(); i++) {
+            if (id.equals(articlesFreq.get(i))) {
+                exist = true;
+            }
+        }
+        if (exist == false) {
+            user.ajouterArticleFrequent(id);
+        }
+        usersR.save(user);
+        return new ResponseEntity<String>("OK", HttpStatus.OK);
+    }
+
+    // ajouter un article favoris
+    @PostMapping(path = "add_favoris_multiple/{id_user}")
+    ResponseEntity<String> addMultipleFrequent(@PathVariable(name = "id_user") String idUsers,
+            @RequestBody List<String> ids) {
+        Users user = usersR.findById(idUsers).get();
+        List<String> articlesFreq = new ArrayList<>();
+        // boolean exist=false;
+
+        for (int i = 0; i < ids.size(); i++) {
+            if (checkFavExist(ids.get(i), articlesFreq) == false) {
+                user.ajouterArticleFrequent(ids.get(i));
+            }
+        }
+        usersR.save(user);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
+    }
+
+    // ajouter un article favoris
+    @DeleteMapping(path = "add_favoris_multiple/{id_user}/{id_article}")
+    ResponseEntity<String> supprimerFav(@PathVariable(name = "id_user") String idUsers,
+            @PathVariable(name = "id_article") String id) {
+        Users user = usersR.findById(idUsers).get();
+        List<String> articlesFreq = new ArrayList<>();
+
+        for (int i = 0; i < articlesFreq.size(); i++) {
+            if (checkFavExist(id, articlesFreq)) {
+                user.getArticlesFrequent().remove(i);
+            }
+        }
+        usersR.save(user);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
+    }
+
+    boolean checkFavExist(String id, List<String> frequents) {
+        for (String freq : frequents) {
+            if (freq.equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

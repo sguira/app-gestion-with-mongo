@@ -53,6 +53,8 @@ public class Users {
     String numeroCompte;
     private String recuperation;
 
+    private List<String> articlesFrequent = new ArrayList<>();
+
     String lang = "fr";
 
     @DBRef
@@ -126,6 +128,10 @@ public class Users {
                 + "\tAdresse:" + info.addresse
                 + "Vous pouvez à present vous connecter grâce à votre nom d'utilisateur" + email
                 + " et votre mot de passe:**********";
+    }
+
+    public void ajouterArticleFrequent(String id) {
+        this.articlesFrequent.add(id);
     }
 
 }
