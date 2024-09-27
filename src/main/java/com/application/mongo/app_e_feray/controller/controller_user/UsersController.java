@@ -413,7 +413,7 @@ public class UsersController {
     ResponseEntity<String> addMultipleFrequent(@PathVariable(name = "id_user") String idUsers,
             @RequestBody List<String> ids) {
         Users user = usersR.findById(idUsers).get();
-        List<String> articlesFreq = new ArrayList<>();
+        List<String> articlesFreq = user.getArticlesFrequent();
         // boolean exist=false;
 
         for (int i = 0; i < ids.size(); i++) {
