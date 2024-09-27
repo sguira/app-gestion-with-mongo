@@ -450,4 +450,8 @@ public class UsersController {
         return false;
     }
 
+    ResponseEntity<List<String>> getfrequents(@PathVariable String id) {
+        return new ResponseEntity<List<String>>(usersR.findById(id).get().getArticlesFrequent(), HttpStatus.OK);
+    }
+
 }
