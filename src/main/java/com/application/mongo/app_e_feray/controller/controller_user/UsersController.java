@@ -430,7 +430,7 @@ public class UsersController {
     ResponseEntity<String> supprimerFav(@PathVariable(name = "id_user") String idUsers,
             @PathVariable(name = "id_article") String id) {
         Users user = usersR.findById(idUsers).get();
-        List<String> articlesFreq = new ArrayList<>();
+        List<String> articlesFreq = user.getArticlesFrequent();
 
         for (int i = 0; i < articlesFreq.size(); i++) {
             if (checkFavExist(id, articlesFreq)) {
