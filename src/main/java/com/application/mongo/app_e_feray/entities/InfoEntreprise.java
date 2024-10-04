@@ -19,4 +19,5 @@ public class InfoEntreprise implements Serializable {
 
     String logo;
     String codeCnn;
+    String ncr;
 }
