@@ -177,7 +177,7 @@ public class UsersController {
                     break;
                 }
             }
-            String passwordEncode = passwordEncoder.encode(password);
+            String passwordEncode = passwordEncoder.encode(recuperation);
             u.setRecuperation(passwordEncode);
             u.setPassword("");
             usersR.save(u);
