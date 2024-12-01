@@ -85,8 +85,15 @@ public class Users {
     @DBRef
     private List<DetailAbonnement> abonnements = new ArrayList<>();
 
+    @DBRef
+    private List<Devis> devis = new ArrayList<>();
+
     public void ajouterCategorie(Categorie cat) {
         this.categories.add(cat);
+    }
+
+    public void ajouterDevis(Devis devis) {
+        this.devis.add(devis);
     }
 
     public void ajouter_client(Client u) {
