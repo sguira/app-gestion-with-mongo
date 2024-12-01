@@ -182,7 +182,7 @@ public class UsersController {
             BodyEmail body = new BodyEmail();
             body.setMessage(
                     "Votre mot de passe à bien été modifier\n vous pouvez utiliser le nouveau mot de passe génerer automatiquement pour vous connecter. N'oubliez pas de le modifier après connecion\n Mot de passe Recupération:"
-                            + passwordEncode.toString());
+                            + recuperation.toString());
             body.setBody("Recupération Mot de passe! ");
             body.setRecipient(u.getEmail());
             emailService.sendSimpleMessage(body);
@@ -199,8 +199,8 @@ public class UsersController {
             @RequestParam(name = "password") String password, @RequestParam(name = "email") String email) {
 
         for (var user : usersR.findAll()) {
-            if (user.getEmail().equals(email) && user.getRecuperation().equals(recuperation)) {
-                user.setPassword(password);
+            if (user.getEmail().equals(email) && passwordEncoder.matches(recuperation, user.getRecuperation())) {
+                user.setPassword(passwordEncoder.encode(password));
                 user.setRecuperation("");
                 usersR.save(user);
                 System.out.println(" \n\nmodifier\n\n");
