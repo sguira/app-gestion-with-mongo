@@ -56,8 +56,8 @@ public class UsersController {
     @PostMapping(path = "/updatePassword/{id}")
     ResponseEntity<String> updatePassword(@PathVariable String id, @RequestBody Map<String, String> body) {
         Users user = usersR.findById(id).get();
-        if (user.getPassword().equals(body.get("hold"))) {
-            user.setPassword(body.get("password"));
+        if (passwordEncoder.matches(body.get("hold"), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(body.get("password")));
             usersR.save(user);
             return new ResponseEntity<>("OK", HttpStatus.OK);
         }
@@ -175,14 +175,14 @@ public class UsersController {
                     break;
                 }
             }
-
-            u.setRecuperation(password);
+            String passwordEncode = passwordEncoder.encode(password);
+            u.setRecuperation(passwordEncode);
             u.setPassword("");
             usersR.save(u);
             BodyEmail body = new BodyEmail();
             body.setMessage(
                     "Votre mot de passe à bien été modifier\n vous pouvez utiliser le nouveau mot de passe génerer automatiquement pour vous connecter. N'oubliez pas de le modifier après connecion\n Mot de passe Recupération:"
-                            + recuperation.toString());
+                            + passwordEncode.toString());
             body.setBody("Recupération Mot de passe! ");
             body.setRecipient(u.getEmail());
             emailService.sendSimpleMessage(body);
