@@ -85,7 +85,7 @@ public class UsersController {
             } else if (result.get(i).getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).getEmail().equals(u.getEmail())
-                        && (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getPassword())) {
+                        && (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getRecuperation())) {
                     return "-2";
                 } else {
                     return "-1";
@@ -184,7 +184,7 @@ public class UsersController {
             BodyEmail body = new BodyEmail();
             body.setMessage(
                     "Votre mot de passe à bien été modifier\n vous pouvez utiliser le nouveau mot de passe génerer automatiquement pour vous connecter. N'oubliez pas de le modifier après connecion\n Mot de passe Recupération:"
-                            + recuperation.toString());
+                            + recuperation);
             body.setBody("Recupération Mot de passe! ");
             body.setRecipient(u.getEmail());
             emailService.sendSimpleMessage(body);
