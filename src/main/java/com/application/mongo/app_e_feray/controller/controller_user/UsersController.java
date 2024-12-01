@@ -74,7 +74,7 @@ public class UsersController {
         for (int i = 0; i < result.size(); i++) {
 
             if (result.get(i).getEmail().equals(u.getEmail()) &&
-                    passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())
+                    (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getPassword())
                     && result.get(i).getRecuperation().equals("")) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).isConfirmed()) {
@@ -85,8 +85,10 @@ public class UsersController {
             } else if (result.get(i).getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).getEmail().equals(u.getEmail())
-                        && passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())) {
+                        && (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getPassword())) {
                     return "-2";
+                } else {
+                    return "-1";
                 }
 
             }
