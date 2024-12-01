@@ -71,21 +71,25 @@ public class UsersController {
         // for (var i : result) {
         // System.out.println(i.getEmail() + "\n\n");
         // }
+        String encode = passwordEncoder.encode(u.getPassword());
+        System.out.println("\n\n\n password:" + u.getPassword() + "\n" + encode);
         for (int i = 0; i < result.size(); i++) {
 
-            if (result.get(i).getEmail().equals(u.getEmail()) &&
-                    (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getPassword())
-                    && result.get(i).getRecuperation().equals("")) {
-                // System.out.println("\n\n" + result.get(i).getEmail());
-                if (result.get(i).isConfirmed()) {
-                    return result.get(i).getId();
-                } else {
-                    return "-3";
+            if (!result.get(i).getPassword().equals("")) {
+                if (result.get(i).getEmail().equals(u.getEmail()) &&
+                        passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())
+                        && result.get(i).getRecuperation().equals("")) {
+                    // System.out.println("\n\n" + result.get(i).getEmail());
+                    if (result.get(i).isConfirmed()) {
+                        return result.get(i).getId();
+                    } else {
+                        return "-3";
+                    }
                 }
             } else if (result.get(i).getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).getEmail().equals(u.getEmail())
-                        && (new BCryptPasswordEncoder()).matches(u.getPassword(), result.get(i).getRecuperation())) {
+                        && passwordEncoder.matches(u.getPassword(), result.get(i).getRecuperation())) {
                     return "-2";
                 } else {
                     return "-1";
