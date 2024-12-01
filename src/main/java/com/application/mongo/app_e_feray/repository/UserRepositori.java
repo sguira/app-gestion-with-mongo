@@ -1,6 +1,7 @@
 package com.application.mongo.app_e_feray.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -33,5 +34,7 @@ public interface UserRepositori extends MongoRepository<Users, String> {
 
     @Query(value = "SELECT * from ventes join users where users_id=:#{#id}")
     Object ventes_by_clients(@Param("id") String id);
+
+    Users findByemail(String username);
 
 }

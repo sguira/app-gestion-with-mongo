@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,6 +48,8 @@ public class UsersController {
     // @Autowired
     // private AbonnementR abonnementR;
 
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Autowired
     private DetailAbonnementRepo detailAbonnementR;
 
@@ -70,7 +74,8 @@ public class UsersController {
         for (int i = 0; i < result.size(); i++) {
 
             if (result.get(i).getEmail().equals(u.getEmail()) &&
-                    result.get(i).getPassword().equals(u.getPassword()) && result.get(i).getRecuperation().equals("")) {
+                    passwordEncoder.matches(result.get(i).getPassword(), u.getPassword())
+                    && result.get(i).getRecuperation().equals("")) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
                 if (result.get(i).isConfirmed()) {
                     return result.get(i).getId();
@@ -79,8 +84,8 @@ public class UsersController {
                 }
             } else if (result.get(i).getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
-                if (result.get(i).getEmail().equals(u.getEmail()) &&
-                        result.get(i).getRecuperation().equals(u.getPassword())) {
+                if (result.get(i).getEmail().equals(u.getEmail())
+                        && passwordEncoder.matches(result.get(i).getPassword(), u.getPassword())) {
                     return "-2";
                 }
 
@@ -94,7 +99,8 @@ public class UsersController {
 
         if (!verifier.addUsers(usersR.findAll(), u.getEmail())) {
             u.setConfirmCode(generateCode());
-
+            String password = passwordEncoder.encode(u.getPassword());
+            u.setPassword(password);
             BodyEmail email = new BodyEmail();
             // email.setRecipient(u.getEmail());
             // email.setBody("Création de compte");
