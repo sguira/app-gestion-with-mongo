@@ -32,7 +32,7 @@ class DevisController {
     DevisRepository devisR;
 
     @PostMapping(path = "/devis/{idUser}")
-    ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @RequestParam String idUser) {
+    ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @PathVariable String idUser) {
 
         Users user = userR.findById(idUser).get();
 
