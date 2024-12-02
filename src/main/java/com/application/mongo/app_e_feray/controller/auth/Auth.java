@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,8 @@ public class Auth {
     @Autowired
     JWTUtils jwtUtils;
 
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @PostMapping(path = "login")
     public ResponseEntity<String> login(@RequestBody Users user) {
         String username = user.getEmail();
@@ -38,7 +41,7 @@ public class Auth {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
 
-        if (!u.getPassword().equals(password)) {
+        if (!passwordEncoder.matches(password, u.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error");
         }
 

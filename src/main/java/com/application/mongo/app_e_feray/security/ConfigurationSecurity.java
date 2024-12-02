@@ -15,7 +15,10 @@ public class ConfigurationSecurity {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(h -> h.disable())
                 // .authorizeHttpRequests(a -> a.requestMatchers("auth/**").permitAll())
-                .authorizeHttpRequests(a -> a.anyRequest().permitAll())
+                .authorizeHttpRequests(a -> {
+                    // a.requestMatchers("/auth/**").authenticated();
+                    a.anyRequest().permitAll();
+                })
                 .build();
     }
 

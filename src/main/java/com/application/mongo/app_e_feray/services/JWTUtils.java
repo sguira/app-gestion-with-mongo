@@ -6,17 +6,18 @@ import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JWTUtils {
 
-    private String SECRETKEY = "guirasouleymane";
+    final private String SECRETKEY = "secretkey";
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(SignatureAlgorithm.HS512, SECRETKEY)
+                .signWith(SignatureAlgorithm.HS512,SECRETKEY)
                 .compact();
     }
 

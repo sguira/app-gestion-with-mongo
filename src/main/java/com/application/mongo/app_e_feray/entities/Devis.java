@@ -21,6 +21,7 @@ public class Devis {
     private String date;
     private String idClient;
     private String description;
-
-    List<String> article = new ArrayList<>();
+    private double montant;
+    private String title;
+    List<String> articles = new ArrayList<>();
 }
