@@ -22,7 +22,7 @@ import com.application.mongo.app_e_feray.repository.DevisRepository;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 
 @RestController
-@RequestMapping("/devis")
+@RequestMapping("/backend/devis")
 @CrossOrigin("*")
 class DevisController {
     @Autowired
@@ -31,7 +31,7 @@ class DevisController {
     @Autowired
     DevisRepository devisR;
 
-    @PostMapping(path = "/ajouter/{idUser}")
+    @PostMapping(path = "/devis/{idUser}")
     ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @RequestParam String idUser) {
 
         Users user = userR.findById(idUser).get();
