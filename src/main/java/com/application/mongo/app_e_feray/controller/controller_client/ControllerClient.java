@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,7 @@ import com.application.mongo.app_e_feray.entities.ventes;
 import com.application.mongo.app_e_feray.repository.ClientRepo;
 import com.application.mongo.app_e_feray.repository.ContactRepo;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
+import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin
@@ -38,70 +40,143 @@ public class ControllerClient {
     @Autowired(required = true)
     private ContactRepo contactRepo;
 
-    // ajouter un nouveau client
-    @PostMapping(path = "/add_client/{id}")
-    ResponseEntity<Client> ajouter_client(@RequestBody Client c, @PathVariable(name = "id") String id) {
-        Users u = usersR.findById(id).get();
-        List<Client> clients = new ArrayList<Client>();
-        clients = u.getClients();
-        Client cc = clientR.save(c);
-        u.ajouter_client(cc);
-        // Contact contact = new Contact();
-        // contact.setName(c.getName());
-        // contact.setNumero(c.getNumber());
-        // contactRepo.save(contact);
-        // u.ajouter_contact(contact);
-        usersR.save(u);
-        return new ResponseEntity<Client>(cc, HttpStatus.CREATED);
+    @Autowired
+    private JWTUtils jwtUtils;
+
+    String tokenValide(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7, token.length());
+                if (jwtUtils.validateToken(token)) {
+                    return token;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    @PostMapping(path = "/add_contact/{id}")
-    ResponseEntity<Contact> ajouterContact(@RequestBody Contact c, @PathVariable String id) {
-        Users u = usersR.findById(id).get();
-        u.ajouter_contact(c);
-        usersR.save(u);
-        return new ResponseEntity<Contact>(contactRepo.save(c), HttpStatus.CREATED);
+    // ajouter un nouveau client
+    @PostMapping(path = "/add_client")
+    ResponseEntity<Client> ajouter_client(@RequestBody Client c, @RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                List<Client> clients = new ArrayList<Client>();
+                clients = u.getClients();
+                Client cc = clientR.save(c);
+                u.ajouter_client(cc);
+
+                usersR.save(u);
+                return new ResponseEntity<Client>(cc, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(path = "/add_contact")
+    ResponseEntity<Contact> ajouterContact(@RequestBody Contact c, @RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                u.ajouter_contact(c);
+                usersR.save(u);
+                return new ResponseEntity<Contact>(contactRepo.save(c), HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "/get_client/{id}")
-    ResponseEntity<List<ventes>> get_clients_ventes(@PathVariable(name = "id") String id) {
+    ResponseEntity<List<ventes>> get_clients_ventes(@PathVariable(name = "id") String id,
+            @RequestHeader("Authorization") String token) {
 
-        return new ResponseEntity<List<ventes>>((List<ventes>) clientR.findById(id).get().getVentes(), HttpStatus.OK);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<ventes>>((List<ventes>) clientR.findById(id).get().getVentes(),
+                        HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "/ventes_for_clients/{id}/{choice}")
-    List<ventes> getVentes(@PathVariable String id, @PathVariable(name = "choice") Long choice) {
-        return clientR.findById(id).get().getVentes();
+    ResponseEntity<List<ventes>> getVentes(@PathVariable String id, @PathVariable(name = "choice") Long choice,
+            @RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<ventes>>(clientR.findById(id).get().getVentes(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping(path = "/search_client_by_name/{id}/{name}")
-    List<Client> recherche_client(@PathVariable(name = "id") String id, @PathVariable(name = "name") String name) {
-        return clientR.search_by_name(id, name);
-    }
+    // @GetMapping(path = "/search_client_by_name/{id}/{name}")
+    // List<Client> recherche_client(@PathVariable(name = "id") String id,
+    // @PathVariable(name = "name") String name) {
+    // return clientR.search_by_name(id, name);
+    // }
 
     @GetMapping(path = "/get_fournisseur/{id}")
-    ResponseEntity<List<Fournisseur>> fournisseurs(@PathVariable String id) {
-        return new ResponseEntity<List<Fournisseur>>((List<Fournisseur>) usersR.findById(id).get().getFournisseurs(),
-                HttpStatus.OK);
+    ResponseEntity<List<Fournisseur>> fournisseurs(@RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<Fournisseur>>(
+                        (List<Fournisseur>) usersR.findByemail(token).getFournisseurs(),
+                        HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Fonction pour modifier un client
-    @PutMapping(path = "/update_client/{id}")
-    ResponseEntity<Client> update_client(@PathVariable(name = "id") String id, @RequestBody Client c) {
-        Users u = usersR.findById(id).get();
-        Client client = clientR.findById(c.getId()).get();
-        List<Client> clients = u.getClients();
-        for (int i = 0; i < clients.size(); i++) {
-            if (clients.get(i).getId().toString().equals(c.getId().toString())) {
-                client.setEmail(c.getEmail());
-                client.setName(c.getName());
-                client.setNumber(c.getNumber());
-                u.getClients().set(i, client);
-                break;
+    @PutMapping(path = "/update_client")
+    ResponseEntity<Client> update_client(@RequestHeader("Authorization") String token, @RequestBody Client c) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Client client = clientR.findById(c.getId()).get();
+                List<Client> clients = u.getClients();
+                for (int i = 0; i < clients.size(); i++) {
+                    if (clients.get(i).getId().toString().equals(c.getId().toString())) {
+                        client.setEmail(c.getEmail());
+                        client.setName(c.getName());
+                        client.setNumber(c.getNumber());
+                        u.getClients().set(i, client);
+                        break;
+                    }
+                }
+                usersR.save(u);
+                return new ResponseEntity<Client>(clientR.save(client), HttpStatus.OK);
+
             }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        usersR.save(u);
-        return new ResponseEntity<Client>(clientR.save(client), HttpStatus.OK);
     }
 
     @PutMapping(path = "/client_modifier/{id}")
@@ -119,21 +194,50 @@ public class ControllerClient {
 
     // get client by id
     @GetMapping(path = "/get_client_by_id/{id}")
-    ResponseEntity<Client> client(@PathVariable String id) {
-        return new ResponseEntity<Client>(clientR.findById(id).get(), HttpStatus.OK);
+    ResponseEntity<Client> client(@PathVariable String id, @RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<Client>(clientR.findById(id).get(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    @DeleteMapping("/delete_client/{id}/{idF}")
-    ResponseEntity<?> deleteClient(@PathVariable(name = "id") String id, @PathVariable(name = "idF") String id2) {
+    @DeleteMapping("/delete_client/{idF}")
+    ResponseEntity<?> deleteClient(@RequestHeader("Authorization") String token,
+            @PathVariable(name = "idF") String id2) {
 
-        clientR.deleteById(id2);
-        return new ResponseEntity(HttpStatus.OK);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                clientR.deleteById(id2);
+                return new ResponseEntity(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
-    @GetMapping(path = "/get_clients/{id}")
-    ResponseEntity<List<Client>> clients(@PathVariable String id) {
+    @GetMapping(path = "/get_clients")
+    ResponseEntity<List<Client>> clients(@RequestHeader("Authorization") String token) {
 
-        return new ResponseEntity<List<Client>>((List<Client>) usersR.findById(id).get().getClients(), HttpStatus.OK);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<Client>>(
+                        (List<Client>) usersR.findByemail(jwtUtils.extractUsername(token)).getClients(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 

@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +19,7 @@ import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 import com.application.mongo.app_e_feray.services.JWTUtils;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 @RestController
@@ -47,6 +50,32 @@ public class Auth {
 
         String token = jwtUtils.generateToken(username);
         return new ResponseEntity<>(token, HttpStatus.OK);
+    }
+
+    @GetMapping("get_user")
+    ResponseEntity<String> extract_user_name(@RequestHeader("Authorization") String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            String userName = jwtUtils.extractUsername(token);
+            return new ResponseEntity<>(userName, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("ERROR", HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping("validate_token")
+    public boolean validate(@RequestHeader("Authorization") String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            return jwtUtils.validateToken(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

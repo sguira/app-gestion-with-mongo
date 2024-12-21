@@ -1,6 +1,7 @@
 package com.application.mongo.app_e_feray.controller.controller_user;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +35,7 @@ import com.application.mongo.app_e_feray.entities.userRender;
 import com.application.mongo.app_e_feray.repository.AbonnementR;
 import com.application.mongo.app_e_feray.repository.DetailAbonnementRepo;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
+import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
@@ -53,51 +56,116 @@ public class UsersController {
     @Autowired
     private DetailAbonnementRepo detailAbonnementR;
 
-    @PostMapping(path = "/updatePassword/{id}")
-    ResponseEntity<String> updatePassword(@PathVariable String id, @RequestBody Map<String, String> body) {
-        Users user = usersR.findById(id).get();
-        if (passwordEncoder.matches(body.get("hold"), user.getPassword())) {
-            user.setPassword(passwordEncoder.encode(body.get("password")));
-            usersR.save(user);
-            return new ResponseEntity<>("OK", HttpStatus.OK);
+    @Autowired
+    private JWTUtils jwtUtils;
+
+    String tokenValide(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7, token.length());
+                if (jwtUtils.validateToken(token)) {
+                    return token;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
         }
-        return new ResponseEntity<>("ERROR", HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/updatePassword")
+    ResponseEntity<String> updatePassword(@RequestHeader("Authorization") String token,
+            @RequestBody Map<String, String> body) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                if (passwordEncoder.matches(body.get("hold"), user.getPassword())) {
+                    user.setPassword(passwordEncoder.encode(body.get("password")));
+                    usersR.save(user);
+                    return new ResponseEntity<>("OK", HttpStatus.OK);
+                }
+                return new ResponseEntity<>("ERROR", HttpStatus.OK);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping(path = "/login")
-    String login(@RequestBody Users u) {
+    ResponseEntity<Map> login(@RequestBody Users u) {
 
         List<Users> result = usersR.findAll();
         // for (var i : result) {
         // System.out.println(i.getEmail() + "\n\n");
         // }
-        String encode = passwordEncoder.encode(u.getPassword());
-        System.out.println("\n\n\n password:" + u.getPassword() + "\n" + encode);
-        for (int i = 0; i < result.size(); i++) {
 
-            if (!result.get(i).getPassword().equals("")) {
-                if (result.get(i).getEmail().equals(u.getEmail()) &&
-                        passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())
-                        && result.get(i).getRecuperation().equals("")) {
+        // ajouté
+        Map<String, String> res = new HashMap<>();
+        Users user = usersR.findByemail(u.getEmail());
+        String encode = passwordEncoder.encode(u.getPassword());
+
+        if (user != null) {
+            if (!user.getPassword().equals("")) {
+                if (user.getEmail().equals(u.getEmail()) &&
+                        passwordEncoder.matches(u.getPassword(), user.getPassword())
+                        && user.getRecuperation().equals("")) {
                     // System.out.println("\n\n" + result.get(i).getEmail());
-                    if (result.get(i).isConfirmed()) {
-                        return result.get(i).getId();
+                    if (user.isConfirmed()) {
+                        res.put("token", jwtUtils.generateToken(u.getEmail()));
+                        res.put("code", "1");
+                        return new ResponseEntity<>(res, HttpStatus.OK);
                     } else {
-                        return "-3";
+                        res.put("code", "-3");
+                        return new ResponseEntity<>(res, HttpStatus.OK);
                     }
                 }
-            } else if (result.get(i).getRecuperation() != null) {
+            } else if (user.getRecuperation() != null) {
                 // System.out.println("\n\n" + result.get(i).getEmail());
-                if (result.get(i).getEmail().equals(u.getEmail())
-                        && passwordEncoder.matches(u.getPassword(), result.get(i).getRecuperation())) {
-                    return "-2";
+                if (user.getEmail().equals(u.getEmail())
+                        && passwordEncoder.matches(u.getPassword(), user.getRecuperation())) {
+                    res.put("code", "-2");
+                    return new ResponseEntity<>(res, HttpStatus.OK);
                 } else {
-                    return "-1";
+                    res.put("code", "-1");
+                    return new ResponseEntity<>(res, HttpStatus.OK);
                 }
 
             }
+
         }
-        return "-1";
+        res.put("code", "-1");
+        return new ResponseEntity<>(res, HttpStatus.OK);
+
+        // for (int i = 0; i < result.size(); i++) {
+
+        // if (!result.get(i).getPassword().equals("")) {
+        // if (result.get(i).getEmail().equals(u.getEmail()) &&
+        // passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())
+        // && result.get(i).getRecuperation().equals("")) {
+        // // System.out.println("\n\n" + result.get(i).getEmail());
+        // if (result.get(i).isConfirmed()) {
+        // return result.get(i).getId();
+        // } else {
+        // return "-3";
+        // }
+        // }
+        // } else if (result.get(i).getRecuperation() != null) {
+        // // System.out.println("\n\n" + result.get(i).getEmail());
+        // if (result.get(i).getEmail().equals(u.getEmail())
+        // && passwordEncoder.matches(u.getPassword(), result.get(i).getRecuperation()))
+        // {
+        // return "-2";
+        // } else {
+        // return "-1";
+        // }
+
+        // }
+        // }
+        // return "-1";
     }
 
     @PostMapping(path = "/adduser")
@@ -138,34 +206,97 @@ public class UsersController {
     }
 
     @PutMapping(path = "/update_user")
-    ResponseEntity<Users> modifierUtilisateur(@RequestBody Users u) {
+    ResponseEntity<Users> modifierUtilisateur(@RequestBody Users u, @RequestHeader("Authorization") String token) {
 
-        Users user = usersR.findById(u.getId()).get();
-        user.setName(u.getName());
-        user.setEmail(u.getEmail());
-        user.setLast_name(u.getLast_name());
-        user.setNumber(u.getNumber());
-        user.setInfo(u.getInfo());
-        // user.setPassword(u.getPassword());
-        return new ResponseEntity<Users>(usersR.save(user), HttpStatus.CREATED);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                if (u.getEmail().equals(user.getEmail())) {
+                    user.setName(u.getName());
+                    user.setEmail(u.getEmail());
+                    user.setLast_name(u.getLast_name());
+                    user.setNumber(u.getNumber());
+                    user.setInfo(u.getInfo());
+                    // user.setPassword(u.getPassword());
+                    return new ResponseEntity<Users>(usersR.save(user), HttpStatus.CREATED);
+                }
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
     }
 
-    @GetMapping(path = "/get_user/{id}")
-    ResponseEntity<Users> getUser(@PathVariable(name = "id") String id) {
-        return new ResponseEntity<Users>(usersR.findById(id).get(), HttpStatus.OK);
+    // ancien
+    // @GetMapping(path = "/get_user/{id}")
+    // ResponseEntity<Users> getUser(@PathVariable(name = "id") String id) {
+    // return new ResponseEntity<Users>(usersR.findById(id).get(), HttpStatus.OK);
+    // }
+
+    // nouveau
+    @GetMapping(path = "/get_user")
+    ResponseEntity<Users> getUser(@RequestHeader("Authorization") String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                String username = jwtUtils.extractUsername(token);
+                Users u = usersR.findByemail(username);
+                if (u != null) {
+                    return new ResponseEntity<Users>(u, HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<Users>(HttpStatus.NOT_FOUND);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+    }
+
+    // verifierToken
+    @GetMapping(path = "/verifier_token")
+    ResponseEntity<String> verifierToken(@RequestHeader("Authorization") String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                if (jwtUtils.validateToken(token)) {
+                    return new ResponseEntity<String>("token valide", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<String>("token non valide", HttpStatus.CONFLICT);
+                }
+            }
+            return new ResponseEntity<String>("token non valide", HttpStatus.CONFLICT);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
     }
 
     // check_mail
-    @GetMapping("/check_mail/{email}")
-    String verification(@PathVariable(name = "email") String email) {
-        List<Users> users = usersR.findAll();
-        for (var i : users) {
-            if (i.getEmail().toLowerCase().equals(email.toLowerCase())) {
-                return "1";
+    @GetMapping("/check_mail")
+    ResponseEntity<?> verification(@RequestHeader(name = "Authorization") String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                List<Users> users = usersR.findAll();
+                for (var i : users) {
+                    if (i.getEmail().toLowerCase().equals(jwtUtils.extractUsername(token).toLowerCase())) {
+                        return new ResponseEntity<>(HttpStatus.OK);
+                    }
+                }
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
             }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return "0";
+
     }
 
     @PostMapping(path = "/recuperation_password")
@@ -218,8 +349,9 @@ public class UsersController {
         return "ERROR";
     }
 
-    @GetMapping(path = "/updateSuscription/{id}/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
-    ResponseEntity<Users> updatSuscription(@PathVariable String id, @PathVariable(name = "prix") double montant,
+    @GetMapping(path = "/updateSuscription/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
+    ResponseEntity<Users> updatSuscription(@RequestHeader("Authorization") String token,
+            @PathVariable(name = "prix") double montant,
             @PathVariable(name = "dateDebut") String dateAbonnement,
             @PathVariable(name = "dateFin") String finAbonnement,
             @PathVariable(name = "number") String numero,
@@ -227,27 +359,39 @@ public class UsersController {
 
     ) {
         try {
-            Users u = usersR.findById(id).get();
-            u.setMontantAbonnement(montant);
-            u.setSuscription(true);
-            u.setDateAbonnement(dateAbonnement);
-            u.setFinAbonnement(finAbonnement);
-            DetailAbonnement abonnement = new DetailAbonnement();
-            abonnement.setDateAbonnement(dateAbonnement);
-            abonnement.setFinAbonnement(finAbonnement);
-            abonnement.setNumero(numero);
-            abonnement.setPrix(montant);
-            abonnement.setDuree(duree);
-            // abonnement.setLabel(numero);
-            abonnement = detailAbonnementR.save(abonnement);
 
-            u.addAbonnement(abonnement);
-            System.out.println("Abonnement");
-            return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
         } catch (Exception e) {
             System.out.println("Erreur abonnement.");
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                u.setMontantAbonnement(montant);
+                u.setSuscription(true);
+                u.setDateAbonnement(dateAbonnement);
+                u.setFinAbonnement(finAbonnement);
+                DetailAbonnement abonnement = new DetailAbonnement();
+                abonnement.setDateAbonnement(dateAbonnement);
+                abonnement.setFinAbonnement(finAbonnement);
+                abonnement.setNumero(numero);
+                abonnement.setPrix(montant);
+                abonnement.setDuree(duree);
+                // abonnement.setLabel(numero);
+                abonnement = detailAbonnementR.save(abonnement);
+
+                u.addAbonnement(abonnement);
+                System.out.println("Abonnement");
+                return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -324,14 +468,42 @@ public class UsersController {
         return new ResponseEntity<List<Users>>(usersR.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/get_user_by_id/{id}")
-    ResponseEntity<userRender> get_users(@PathVariable(name = "id") String id) {
+    boolean verifieToken(String token) {
+        try {
+            boolean res = jwtUtils.validateToken(token);
+            if (res == true) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
 
-        Users u = usersR.findById(id).get();
-        userRender u_ = new userRender(u.getId(), u.getName(), u.getEmail(), u.getNumber(), u.getInfo(),
-                u.getDateAbonnement(), u.getFinAbonnement(), u.getNumeroCompte(), u.getAbonnements());
+    }
 
-        return new ResponseEntity<userRender>(u_, HttpStatus.OK);
+    @GetMapping(path = "/get_user_by_id")
+    ResponseEntity<userRender> get_users(@RequestHeader("Authorization") String token) {
+
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                if (verifieToken(token)) {
+                    Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+
+                    userRender u_ = new userRender(u.getId(), u.getName(), u.getEmail(), u.getNumber(), u.getInfo(),
+                            u.getDateAbonnement(), u.getFinAbonnement(), u.getNumeroCompte(), u.getAbonnements());
+
+                    return new ResponseEntity<userRender>(u_, HttpStatus.OK);
+
+                }
+                return new ResponseEntity<userRender>(HttpStatus.UNAUTHORIZED);
+            } else {
+                return new ResponseEntity<userRender>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<userRender>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     String generateCode() {
@@ -402,55 +574,84 @@ public class UsersController {
     }
 
     // ajouter un article favoris
-    @PostMapping(path = "add_favoris/{id_user}/{id_article}")
-    ResponseEntity<String> addArticleFavoris(@PathVariable(name = "id_user") String idUsers,
+    @PostMapping(path = "add_favoris/{id_article}")
+    ResponseEntity<String> addArticleFavoris(@RequestHeader(name = "Authorization") String token,
             @PathVariable(name = "id_article") String id) {
-        Users user = usersR.findById(idUsers).get();
-        List<String> articlesFreq = new ArrayList<>();
-        boolean exist = false;
-        for (int i = 0; i < articlesFreq.size(); i++) {
-            if (id.equals(articlesFreq.get(i))) {
-                exist = true;
+        try {
+            token = tokenValide(token);
+
+            if (token != null) {
+                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                List<String> articlesFreq = new ArrayList<>();
+                boolean exist = false;
+                for (int i = 0; i < articlesFreq.size(); i++) {
+                    if (id.equals(articlesFreq.get(i))) {
+                        exist = true;
+                    }
+                }
+                if (exist == false) {
+                    user.ajouterArticleFrequent(id);
+                }
+                usersR.save(user);
+                return new ResponseEntity<String>("OK", HttpStatus.OK);
             }
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (exist == false) {
-            user.ajouterArticleFrequent(id);
-        }
-        usersR.save(user);
-        return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 
     // ajouter un article favoris
-    @PostMapping(path = "add_favoris_multiple/{id_user}")
-    ResponseEntity<String> addMultipleFrequent(@PathVariable(name = "id_user") String idUsers,
+    @PostMapping(path = "add_favoris_multiple")
+    ResponseEntity<String> addMultipleFrequent(@RequestHeader(name = "Authorization") String token,
             @RequestBody List<String> ids) {
-        Users user = usersR.findById(idUsers).get();
-        List<String> articlesFreq = user.getArticlesFrequent();
-        // boolean exist=false;
 
-        for (int i = 0; i < ids.size(); i++) {
-            if (checkFavExist(ids.get(i), articlesFreq) == false) {
-                user.ajouterArticleFrequent(ids.get(i));
+        try {
+            token = tokenValide(token);
+
+            if (token != null) {
+                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                List<String> articlesFreq = user.getArticlesFrequent();
+                // boolean exist=false;
+
+                for (int i = 0; i < ids.size(); i++) {
+                    if (checkFavExist(ids.get(i), articlesFreq) == false) {
+                        user.ajouterArticleFrequent(ids.get(i));
+                    }
+                }
+                usersR.save(user);
+                return new ResponseEntity<>("OK", HttpStatus.OK);
             }
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        usersR.save(user);
-        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
     // ajouter un article favoris
-    @GetMapping(path = "delete_favoris/{id_user}/{id_article}")
-    ResponseEntity<String> supprimerFav(@PathVariable(name = "id_user") String idUsers,
+    @GetMapping(path = "delete_favoris/{id_article}")
+    ResponseEntity<?> supprimerFav(@RequestHeader(name = "Authorization") String token,
             @PathVariable(name = "id_article") String id) {
-        Users user = usersR.findById(idUsers).get();
-        List<String> articlesFreq = user.getArticlesFrequent();
 
-        for (int i = 0; i < articlesFreq.size(); i++) {
-            if (checkFavExist(id, articlesFreq)) {
-                user.getArticlesFrequent().remove(i);
+        try {
+            token = tokenValide(token);
+
+            if (token != null) {
+                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                List<String> articlesFreq = user.getArticlesFrequent();
+
+                for (int i = 0; i < articlesFreq.size(); i++) {
+                    if (checkFavExist(id, articlesFreq)) {
+                        user.getArticlesFrequent().remove(i);
+                    }
+                }
+                usersR.save(user);
+                return new ResponseEntity<>(HttpStatus.OK);
             }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        usersR.save(user);
-        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
     boolean checkFavExist(String id, List<String> frequents) {
@@ -463,8 +664,17 @@ public class UsersController {
     }
 
     @GetMapping(path = "frequences/{id}")
-    ResponseEntity<List<String>> getfrequents(@PathVariable String id) {
-        return new ResponseEntity<List<String>>(usersR.findById(id).get().getArticlesFrequent(), HttpStatus.OK);
+    ResponseEntity<List<String>> getfrequents(@RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<String>>(
+                        usersR.findByemail(jwtUtils.extractUsername(token)).getArticlesFrequent(), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import com.application.mongo.app_e_feray.entities.Categorie;
 import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.repository.CategorieRepositori;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
+import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
@@ -31,53 +33,91 @@ public class CategorieController {
     @Autowired(required = true)
     private UserRepositori usersR;
 
-    @PostMapping(path = "/addcategorie/{id}")
-    ResponseEntity<Categorie> ajouterCategorie(@RequestBody Categorie cat, @PathVariable(name = "id") String id) {
-        Users u = usersR.findById(id).get();
-        System.out.println("Client " + u.getName());
-        List<Categorie> cats = (List<Categorie>) (u.getCategories());
-        if (cats.size() > 0) {
-            for (int i = 0; i < cats.size(); i++) {
-                if (cats.get(i) != null) {
-                    if (cats.get(i).getName() != null) {
-                        if (cats.get(i).getName().equals(cat.getName())) {
-                            System.out.println(" CONFLICT >>>>>>>>>>>>> ");
-                            return new ResponseEntity<>(HttpStatus.CONFLICT);
+    @Autowired
+    JWTUtils jwtUtils;
+
+    String tokenValide(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7, token.length());
+                if (jwtUtils.validateToken(token)) {
+                    return token;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @PostMapping(path = "/addcategorie")
+    ResponseEntity<Categorie> ajouterCategorie(@RequestBody Categorie cat,
+            @RequestHeader("Authorization") String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                System.out.println("Client " + u.getName());
+                List<Categorie> cats = (List<Categorie>) (u.getCategories());
+                if (cats.size() > 0) {
+                    for (int i = 0; i < cats.size(); i++) {
+                        if (cats.get(i) != null) {
+                            if (cats.get(i).getName() != null) {
+                                if (cats.get(i).getName().equals(cat.getName())) {
+                                    System.out.println(" CONFLICT >>>>>>>>>>>>> ");
+                                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                                }
+                            }
                         }
                     }
                 }
+                Categorie categorie = catR.save(cat);
+                u.ajouterCategorie(categorie);
+                usersR.save(u);
+                // catR.save(categorie);
+                return new ResponseEntity<Categorie>(categorie, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Categorie categorie = catR.save(cat);
-        u.ajouterCategorie(categorie);
-        usersR.save(u);
-        // catR.save(categorie);
-        return new ResponseEntity<Categorie>(categorie, HttpStatus.CREATED);
 
     }
 
     @DeleteMapping(path = "/delete_categorie/{id}")
-    int deletecategorie(@PathVariable String id) throws Exception {
+    ResponseEntity<?> deletecategorie(@RequestHeader("Authorization") String token, @PathVariable String id)
+            throws Exception {
         try {
-            catR.deleteById(id);
-            return 1;
+            token = tokenValide(token);
+            if (token != null) {
+                catR.deleteById(id);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping(value = "/update_categorie/{id}")
-    ResponseEntity<Categorie> updateCategorie(@PathVariable(name = "id") String id, @RequestBody Categorie cat_)
+    @PutMapping(value = "/update_categorie")
+    ResponseEntity<Categorie> updateCategorie(@RequestHeader("Authorization") String token, @RequestBody Categorie cat_)
             throws Exception {
         try {
-            Users u = usersR.findById(id).get();
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
 
-            Categorie cat = catR.findById(cat_.getId()).get();
-            cat.setName(cat_.getName());
-            cat.setDescription(cat_.getDescription());
+                Categorie cat = catR.findById(cat_.getId()).get();
+                cat.setName(cat_.getName());
+                cat.setDescription(cat_.getDescription());
 
-            return new ResponseEntity<Categorie>(catR.save(cat), HttpStatus.OK);
+                return new ResponseEntity<Categorie>(catR.save(cat), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             System.out.println("error" + e);
             e.printStackTrace();
@@ -86,10 +126,19 @@ public class CategorieController {
 
     }
 
-    @GetMapping(path = "/all_categories/{id}")
-    ResponseEntity<List<Categorie>> get_categorie_by_user(@PathVariable(name = "id") String id) {
-        return new ResponseEntity<List<Categorie>>((List<Categorie>) usersR.findById(id).get().getCategories(),
-                HttpStatus.OK);
+    @GetMapping(path = "/all_categories")
+    ResponseEntity<List<Categorie>> get_categorie_by_user(@RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<List<Categorie>>(usersR.findByemail(token).getCategories(),
+                        HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

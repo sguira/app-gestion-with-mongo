@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.entities.Devis;
 import com.application.mongo.app_e_feray.repository.DevisRepository;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
+import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @RequestMapping("/backend/devis")
@@ -31,21 +33,63 @@ class DevisController {
     @Autowired
     DevisRepository devisR;
 
-    @PostMapping(path = "/devis/{idUser}")
-    ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @PathVariable String idUser) {
+    @Autowired
+    JWTUtils jwtUtils;
 
-        Users user = userR.findById(idUser).get();
-
-        devisR.save(devis);
-        user.ajouterDevis(devis);
-        userR.save(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+    String tokenValide(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7, token.length());
+                if (jwtUtils.validateToken(token)) {
+                    return token;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    @GetMapping(path = "/devis/{id}")
-    public ResponseEntity<List<Devis>> getDevisByArticle(@PathVariable String id) {
-        Users u = userR.findById(id).get();
-        return new ResponseEntity<>(u.getDevis(), HttpStatus.OK);
+    @PostMapping(path = "/devis")
+    ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @RequestHeader("Authorization") String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users user = userR.findByemail(jwtUtils.extractUsername(token));
+
+                devisR.save(devis);
+                user.ajouterDevis(devis);
+                userR.save(user);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // @GetMapping(path = "/devis/{id}")
+    // public ResponseEntity<List<Devis>> getDevisByArticle(@PathVariable String id)
+    // {
+    // Users u = userR.findById(id).get();
+    // return new ResponseEntity<>(u.getDevis(), HttpStatus.OK);
+    // }
+
+    @GetMapping(path = "/devis")
+    ResponseEntity<List<Devis>> getDevis(@RequestHeader("Authorization") String token) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = userR.findByemail(jwtUtils.extractUsername(token));
+                if (u != null) {
+                    return new ResponseEntity<>(u.getDevis(), HttpStatus.OK);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

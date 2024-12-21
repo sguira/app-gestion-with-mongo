@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,6 +56,7 @@ import com.application.mongo.app_e_feray.repository.ProduitRepository;
 import com.application.mongo.app_e_feray.repository.TacheRepositorie;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 import com.application.mongo.app_e_feray.repository.VenteRepo;
+import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @CrossOrigin("*")
 @RestController
@@ -96,6 +98,9 @@ public class controller {
 
     @Autowired
     EmailServiceImp emailService = new EmailServiceImp();
+
+    @Autowired
+    JWTUtils jwtUtils;
 
     @PostMapping(path = "/sendMail")
     String envoyerMail(@RequestBody BodyEmail body) {
@@ -218,80 +223,92 @@ public class controller {
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/get_bilan/{date1}/{date2}/{id}")
+    @GetMapping(path = "/get_bilan/{date1}/{date2}")
     ResponseEntity<Bilan> bilan_ventes(@PathVariable(name = "date2") String date2,
-            @PathVariable(name = "date1") String date1, @PathVariable(name = "id") String id) {
+            @PathVariable(name = "date1") String date1, @RequestHeader(name = "Authorization") String token) {
         Bilan bilan = new Bilan();
 
-        Users u = usersR.findById(id).get();
-        double achat = 0;
-        double vente = 0;
-        double payeV = 0;
-        double payeA = 0;
-        double rentree = 0;
-        double depense = 0;
-        for (var element : u.getAchats()) {
-            if (element.getDate().split(" ")[0].compareTo(date1) >= 0
-                    && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
-                if (element.getTypeOperation() != null) {
-                    if (element.getTypeOperation().equals("DEPENSE")) {
-                        depense += element.getEspece();
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                double achat = 0;
+                double vente = 0;
+                double payeV = 0;
+                double payeA = 0;
+                double rentree = 0;
+                double depense = 0;
+                for (var element : u.getAchats()) {
+                    if (element.getDate().split(" ")[0].compareTo(date1) >= 0
+                            && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
+                        if (element.getTypeOperation() != null) {
+                            if (element.getTypeOperation().equals("DEPENSE")) {
+                                depense += element.getEspece();
 
-                    } else {
+                            } else {
 
-                        achat += element.getMontant() + element.getTva() - element.getMontantRemise();
-                        payeA += element.getEspece();
-                        if (!element.getRemboursement().isEmpty()) {
-                            for (var i = 0; i < element.getRemboursement().size() - 1; i++) {
-                                if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
-                                        && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
-                                                .compareTo(date2) <= 0) {
-                                    payeA += Double.parseDouble(element.getRemboursement().get(i).split(",")[0]);
+                                achat += element.getMontant() + element.getTva() - element.getMontantRemise();
+                                payeA += element.getEspece();
+                                if (!element.getRemboursement().isEmpty()) {
+                                    for (var i = 0; i < element.getRemboursement().size() - 1; i++) {
+                                        if (element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                .compareTo(date1) >= 0
+                                                && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                        .compareTo(date2) <= 0) {
+                                            payeA += Double
+                                                    .parseDouble(element.getRemboursement().get(i).split(",")[0]);
 
+                                        }
+                                    }
                                 }
                             }
+
                         }
+
                     }
-
                 }
+                for (var element : u.getVentes()) {
+                    if (element.getDate().split(" ")[0].compareTo(date1) >= 0
+                            && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
+                        if (element.getTypeOperation() != null) {
+                            if (!element.getTypeOperation().equals("RENTREE")) {
+                                vente += element.getPrix() + element.getTva() - element.getMontantRemise();
+                                payeV += element.getEspece();
+                            } else {
 
-            }
-        }
-        for (var element : u.getVentes()) {
-            if (element.getDate().split(" ")[0].compareTo(date1) >= 0
-                    && element.getDate().split(" ")[0].compareTo(date2) <= 0) {
-                if (element.getTypeOperation() != null) {
-                    if (!element.getTypeOperation().equals("RENTREE")) {
-                        vente += element.getPrix() + element.getTva() - element.getMontantRemise();
-                        payeV += element.getEspece();
-                    } else {
+                                rentree += element.getEspece();
 
-                        rentree += element.getEspece();
+                                if (!element.getRemboursement().isEmpty()) {
+                                    for (var i = 1; i < element.getRemboursement().size() - 1; i++) {
+                                        if (element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                .compareTo(date1) >= 0
+                                                && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
+                                                        .compareTo(date2) <= 0) {
+                                            payeA += Double
+                                                    .parseDouble(element.getRemboursement().get(i).split(",")[0]);
 
-                        if (!element.getRemboursement().isEmpty()) {
-                            for (var i = 1; i < element.getRemboursement().size() - 1; i++) {
-                                if (element.getRemboursement().get(i).split(",")[1].split(" ")[0].compareTo(date1) >= 0
-                                        && element.getRemboursement().get(i).split(",")[1].split(" ")[0]
-                                                .compareTo(date2) <= 0) {
-                                    payeA += Double.parseDouble(element.getRemboursement().get(i).split(",")[0]);
-
+                                        }
+                                    }
                                 }
                             }
+
                         }
+
                     }
-
                 }
+                bilan.setMontant_achat(achat);
+                bilan.setPaye_achat(payeA);
+                bilan.setMontant_vente(vente);
+                bilan.setPaye_vente(payeV);
+                bilan.setDepense(depense);
+                bilan.setRentree(rentree);
 
+                return new ResponseEntity<Bilan>(bilan, HttpStatus.OK);
             }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        bilan.setMontant_achat(achat);
-        bilan.setPaye_achat(payeA);
-        bilan.setMontant_vente(vente);
-        bilan.setPaye_vente(payeV);
-        bilan.setDepense(depense);
-        bilan.setRentree(rentree);
-
-        return new ResponseEntity<Bilan>(bilan, HttpStatus.OK);
     }
 
     // supprimer une commande
@@ -309,56 +326,79 @@ public class controller {
         }
     }
 
-    @GetMapping(path = "vente_semaine_2/{id}/{date}")
-    ResponseEntity<List<Double>> getVenteSemaine2(@PathVariable(name = "id") String id,
+    String tokenValide(String token) {
+        try {
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7, token.length());
+                if (jwtUtils.validateToken(token)) {
+                    return token;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @GetMapping(path = "vente_semaine_2/{date}")
+    ResponseEntity<List<Double>> getVenteSemaine2(@RequestHeader("Authorization") String token,
             @PathVariable(name = "date") String date) {
         List<Double> montant = new ArrayList<Double>();
-        Users u = usersR.findById(id).get();
-        String[] date_ = date.split(",");
-        for (var d : date_) {
-            System.out.println("Date: " + d + '\n');
-            double montantT = 0;
-            for (var v : u.getVentes()) {
-                if (v.getDate().split(" ")[0].equals(d)) {
-                    montantT += v.getEspece();
-                }
-                if (!v.getRemboursement().isEmpty()) {
-                    for (int i = 0; i < v.getRemboursement().size() - 1; i++) {
-                        try {
-                            if (v.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
-                                montantT += Double.parseDouble(v.getRemboursement().get(i).toString().split(",")[0]);
+        token = tokenValide(token);
+        if (token != null) {
+
+            Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+            String[] date_ = date.split(",");
+            for (var d : date_) {
+                System.out.println("Date: " + d + '\n');
+                double montantT = 0;
+                for (var v : u.getVentes()) {
+                    if (v.getDate().split(" ")[0].equals(d)) {
+                        montantT += v.getEspece();
+                    }
+                    if (!v.getRemboursement().isEmpty()) {
+                        for (int i = 0; i < v.getRemboursement().size() - 1; i++) {
+                            try {
+                                if (v.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
+                                    montantT += Double
+                                            .parseDouble(v.getRemboursement().get(i).toString().split(",")[0]);
+                                }
+                            } catch (Exception ex) {
+                                System.out.println("Erreur: " + ex.getMessage());
                             }
-                        } catch (Exception ex) {
-                            System.out.println("Erreur: " + ex.getMessage());
+                        }
+                    }
+
+                }
+                montant.add(montantT);
+            }
+            for (var d : date_) {
+                double montantI = 0;
+                for (var a : u.getAchats()) {
+                    if (a.getDate().split(" ")[0].equals(d)) {
+                        montantI += a.getEspece();
+                    }
+                    if (!a.getRemboursement().isEmpty()) {
+                        for (var i = 0; i < a.getRemboursement().size() - 1; i++) {
+                            try {
+                                if (a.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
+                                    montantI += Double
+                                            .parseDouble(a.getRemboursement().get(i).toString().split(",")[0]);
+                                }
+                            } catch (Exception ex) {
+
+                            }
                         }
                     }
                 }
-
+                montant.add(montantI);
             }
-            montant.add(montantT);
-        }
-        for (var d : date_) {
-            double montantI = 0;
-            for (var a : u.getAchats()) {
-                if (a.getDate().split(" ")[0].equals(d)) {
-                    montantI += a.getEspece();
-                }
-                if (!a.getRemboursement().isEmpty()) {
-                    for (var i = 0; i < a.getRemboursement().size() - 1; i++) {
-                        try {
-                            if (a.getRemboursement().get(i).split(",")[1].split(" ")[0].equals(d)) {
-                                montantI += Double.parseDouble(a.getRemboursement().get(i).toString().split(",")[0]);
-                            }
-                        } catch (Exception ex) {
 
-                        }
-                    }
-                }
-            }
-            montant.add(montantI);
-        }
+            return new ResponseEntity<List<Double>>(montant, HttpStatus.OK);
 
-        return new ResponseEntity<List<Double>>(montant, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
+
     }
 
     @GetMapping(path = "/get_ventes_journaliere/{id}/{choice}/{date1}/{date2}/{date3}/{date4}/{date5}/{date6}/{date7}")
@@ -455,40 +495,80 @@ public class controller {
         return new ResponseEntity<List<ventes>>(usersR.findById(id).get().getVentes(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/add_tache/{id}")
-    ResponseEntity<Tache> add_tache(@PathVariable(name = "id") String id, @RequestBody Tache t) {
+    @PostMapping(path = "/add_tache")
+    ResponseEntity<Tache> add_tache(@RequestHeader(name = "Authorization") String token, @RequestBody Tache t) {
 
-        System.out.println("\n\ntaches: \n" + t);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                System.out.println("\n\ntaches: \n" + t);
 
-        Users u = usersR.findById(id).get();
-        Tache tache = tacheR.save(t);
-        u.ajouter_tache(tache);
-        usersR.save(u);
-        return new ResponseEntity<>(tache, HttpStatus.CREATED);
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Tache tache = tacheR.save(t);
+                u.ajouter_tache(tache);
+                usersR.save(u);
+                return new ResponseEntity<>(tache, HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DeleteMapping(path = "/deleteTache/{id}")
-    ResponseEntity<?> deleteTache(@PathVariable String id) {
-        System.out.println("Identifiant:" + id + "\n\n");
-        tacheR.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
+    ResponseEntity<?> deleteTache(@PathVariable String id, @RequestHeader("Authorization") String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                System.out.println("Identifiant:" + id + "\n\n");
+                tacheR.deleteById(id);
+                return new ResponseEntity<>(HttpStatus.OK);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PutMapping(path = "/updateTache/{id}")
-    ResponseEntity<Tache> modifierTache(@RequestBody Tache tache, @PathVariable String id) throws Exception {
-        return new ResponseEntity<Tache>(tacheR.save(tache), HttpStatus.CREATED);
+    ResponseEntity<Tache> modifierTache(@RequestBody Tache tache, @PathVariable String id,
+            @RequestHeader("Authorization") String token) throws Exception {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                return new ResponseEntity<Tache>(tacheR.save(tache), HttpStatus.CREATED);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping(path = "/find_days/{id}/{date}")
-    List<Tache> find_days(@PathVariable String id, @PathVariable String date) {
-        List<Tache> taches = new ArrayList<>();
+    @GetMapping(path = "/find_days/{date}")
+    ResponseEntity<List<Tache>> find_days(@RequestHeader("Authorization") String token, @PathVariable String date) {
 
-        usersR.findById(id).get().getTaches().forEach(e -> {
-            if (e.getDate_().equals(date)) {
-                taches.add(e);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                List<Tache> taches = new ArrayList<>();
+
+                usersR.findByemail(jwtUtils.extractUsername(token)).getTaches().forEach(e -> {
+                    if (e.getDate_().equals(date)) {
+                        taches.add(e);
+                    }
+                });
+                return new ResponseEntity<>(taches, HttpStatus.OK);
+
             }
-        });
-        return taches;
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "/ventes_semaine/{id}/{date}/{jour_semaine}/{choice}")
@@ -552,121 +632,204 @@ public class controller {
         return res;
     }
 
-    @PostMapping("/ajouterCommande/{id}/{id2}")
-    ResponseEntity<Commande> addCommande(@RequestBody Commande c, @PathVariable(name = "id") String id,
+    @PostMapping("/ajouterCommande/{id2}")
+    ResponseEntity<Commande> addCommande(@RequestBody Commande c, @RequestHeader(name = "Authorization") String token,
             @PathVariable(name = "id2") String id2) {
 
-        Users utilisateur = usersR.findById(id).get();
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users utilisateur = usersR.findByemail(jwtUtils.extractUsername(token));
 
-        for (var commande : utilisateur.getCommande()) {
-            if (commande.getRef().toLowerCase().equals(c.getRef().toLowerCase())) {
-                return new ResponseEntity<>(HttpStatus.CONFLICT);
+                for (var commande : utilisateur.getCommande()) {
+                    if (commande.getRef().toLowerCase().equals(c.getRef().toLowerCase())) {
+                        return new ResponseEntity<>(HttpStatus.CONFLICT);
+                    }
+                }
+
+                Client client = clientR.findById(id2).get();
+
+                Commande newCommande = commandeRepo.save(c);
+                utilisateur.addCommande(newCommande);
+                client.ajouterCommande(newCommande);
+                clientR.save(client);
+                usersR.save(utilisateur);
+                return new ResponseEntity<Commande>(newCommande, HttpStatus.CREATED);
+
             }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        Client client = clientR.findById(id2).get();
-
-        Commande newCommande = commandeRepo.save(c);
-        utilisateur.addCommande(newCommande);
-        client.ajouterCommande(newCommande);
-        clientR.save(client);
-        usersR.save(utilisateur);
-        return new ResponseEntity<Commande>(newCommande, HttpStatus.CREATED);
     }
 
-    @GetMapping("/allCommande/{id}")
-    ResponseEntity<List<Commande>> getCommandeByUser(@PathVariable String id) {
-        Users u = usersR.findById(id).get();
-        List<Commande> commandes = new ArrayList<>();
+    @GetMapping("/allCommande")
+    ResponseEntity<List<Commande>> getCommandeByUser(@RequestHeader("Authorization") String token) {
 
-        commandes = u.getCommande();
-        return new ResponseEntity<List<Commande>>(commandes, HttpStatus.OK);
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                List<Commande> commandes = new ArrayList<>();
+
+                commandes = u.getCommande();
+                return new ResponseEntity<List<Commande>>(commandes, HttpStatus.OK);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/terminer/{id}")
-    ResponseEntity terminerCommande(@PathVariable(name = "id") String id) {
-        Commande c = commandeRepo.findById(id).get();
-        c.setTerminer(!c.terminer);
-        commandeRepo.save(c);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    ResponseEntity terminerCommande(@PathVariable(name = "id") String id,
+            @RequestHeader("Authorization") String token) {
 
-    @GetMapping("/getVenteCommande/{id}/{name}")
-    ResponseEntity<List<ventes>> getventeBycommande(@PathVariable("id") String id, @PathVariable("name") String name) {
-        List<ventes> v = usersR.findById(id).get().getVentes();
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Commande c = commandeRepo.findById(id).get();
+                c.setTerminer(!c.terminer);
+                commandeRepo.save(c);
+                return new ResponseEntity<>(HttpStatus.OK);
 
-        List<ventes> v_ = new ArrayList<>();
-        v.forEach((e) -> {
-            if (e.getNumeroCommande() != null && e.getNumeroCommande().equals(name)) {
-                v_.add(e);
             }
-        });
-        return new ResponseEntity<List<ventes>>(v_, HttpStatus.OK);
-    }
-
-    @PostMapping("/updateLogo/{id}")
-    ResponseEntity updateLogo(@RequestBody String path, @PathVariable String id) {
-        System.out.println(path);
-        Users u = usersR.findById(id).get();
-        u.setImage_url(path);
-        u.getInfo().setLogo(path);
-        usersR.save(u);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/getVentesAnnee/{id}/{year}")
-    ResponseEntity<List<Double>> getVentes(@PathVariable String id, @PathVariable String date) {
-        List<Double> annee = new ArrayList<Double>();
-        List<ventes> ventes = usersR.findById(id).get().getVentes();
-        for (int i = 1; i <= 12; i++) {
-            Double montant = 0d;
-            for (int j = 0; j < ventes.size(); j++) {
-                if (ventes.get(i).getDate().equals(date)) {
-                    montant += ventes.get(i).getEspece();
-                }
-            }
-            annee.add(0, montant);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(annee, HttpStatus.OK);
+    }
+
+    @GetMapping("/getVenteCommande/{name}")
+    ResponseEntity<List<ventes>> getventeBycommande(@RequestHeader("Authorization") String token,
+            @PathVariable("name") String name) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                List<ventes> v = usersR.findByemail(jwtUtils.extractUsername(token)).getVentes();
+
+                List<ventes> v_ = new ArrayList<>();
+                v.forEach((e) -> {
+                    if (e.getNumeroCommande() != null && e.getNumeroCommande().equals(name)) {
+                        v_.add(e);
+                    }
+                });
+                return new ResponseEntity<List<ventes>>(v_, HttpStatus.OK);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @PostMapping("/updateLogo")
+    ResponseEntity updateLogo(@RequestBody String path, @RequestHeader String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                System.out.println(path);
+                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                u.setImage_url(path);
+                u.getInfo().setLogo(path);
+                usersR.save(u);
+                return new ResponseEntity<>(HttpStatus.CREATED);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/getVentesAnnee/{year}")
+    ResponseEntity<List<Double>> getVentes(@RequestHeader("Authorization") String token, @PathVariable String date) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                List<Double> annee = new ArrayList<Double>();
+                List<ventes> ventes = usersR.findByemail(jwtUtils.extractUsername(token)).getVentes();
+                for (int i = 1; i <= 12; i++) {
+                    Double montant = 0d;
+                    for (int j = 0; j < ventes.size(); j++) {
+                        if (ventes.get(i).getDate().equals(date)) {
+                            montant += ventes.get(i).getEspece();
+                        }
+                    }
+                    annee.add(0, montant);
+                }
+                return new ResponseEntity<>(annee, HttpStatus.OK);
+
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "get_vente_by_id/{id}/{choice}")
-    ResponseEntity<?> getSingleVente(@PathVariable String id, @PathVariable(name = "choice") int choice)
+    ResponseEntity<?> getSingleVente(@PathVariable String id, @PathVariable(name = "choice") int choice,
+            @RequestHeader("Authorization") String token)
             throws Exception {
-        switch (choice) {
-            case 1: {
-                return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                switch (choice) {
+                    case 1: {
+                        return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+                    }
+                    case 2: {
+                        return new ResponseEntity<Achat>(achatR.findById(id).get(), HttpStatus.OK);
+                    }
+                    default:
+                        return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+                }
+
             }
-            case 2: {
-                return new ResponseEntity<Achat>(achatR.findById(id).get(), HttpStatus.OK);
-            }
-            default:
-                return new ResponseEntity<ventes>(venteRepo.findById(id).get(), HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping(path = "update_ventes/{id}/{montant}/{date}/{choice}")
     ResponseEntity<?> updateVente(@PathVariable(name = "id") String id,
             @PathVariable(name = "montant") double montant, @PathVariable(name = "date") String date,
-            @PathVariable int choice) {
-        switch (choice) {
-            case 1: {
-                String val = montant + "," + date;
-                ventes ventes = venteRepo.findById(id).get();
-                ventes.setEspece(ventes.getEspece() + montant);
-                ventes.addVentes(val);
-                return new ResponseEntity<ventes>(venteRepo.save(ventes), HttpStatus.CREATED);
+            @PathVariable int choice, @RequestHeader("Authorization") String token) {
+
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                switch (choice) {
+                    case 1: {
+                        String val = montant + "," + date;
+                        ventes ventes = venteRepo.findById(id).get();
+                        ventes.setEspece(ventes.getEspece() + montant);
+                        ventes.addVentes(val);
+                        return new ResponseEntity<ventes>(venteRepo.save(ventes), HttpStatus.CREATED);
+                    }
+                    case 2: {
+                        String val = montant + "," + date;
+                        Achat achat = achatR.findById(id).get();
+                        achat.setEspece(achat.getEspece() + montant);
+                        achat.addAchat(val);
+                        return new ResponseEntity<Achat>(achatR.save(achat), HttpStatus.CREATED);
+                    }
+                    default: {
+                        return null;
+                    }
+                }
+
             }
-            case 2: {
-                String val = montant + "," + date;
-                Achat achat = achatR.findById(id).get();
-                achat.setEspece(achat.getEspece() + montant);
-                achat.addAchat(val);
-                return new ResponseEntity<Achat>(achatR.save(achat), HttpStatus.CREATED);
-            }
-            default: {
-                return null;
-            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

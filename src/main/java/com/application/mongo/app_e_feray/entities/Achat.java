@@ -35,7 +35,7 @@ public class Achat implements Serializable {
     private double montantRemise = 0;
     private List<String> remboursement = new ArrayList<>();
     private String dateEcheance;
-
+    private boolean tvaExored=false;
     public void addAchat(String item) {
         this.remboursement.add(0, item);
     }
