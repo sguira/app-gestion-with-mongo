@@ -727,7 +727,7 @@ public class controller {
     }
 
     @PostMapping("/updateLogo")
-    ResponseEntity updateLogo(@RequestBody String path, @RequestHeader String token) {
+    ResponseEntity updateLogo(@RequestBody String path, @RequestHeader("Authorization") String token) {
 
         try {
             token = tokenValide(token);
