@@ -277,24 +277,16 @@ public class UsersController {
 
     // check_mail
     @GetMapping("/check_mail")
-    ResponseEntity<?> verification(@RequestHeader(name = "Authorization") String token) {
+    ResponseEntity<?> verification(@PathVariable String email) {
 
         try {
-            token = tokenValide(token);
-            if (token != null) {
-                List<Users> users = usersR.findAll();
-                for (var i : users) {
-                    if (i.getEmail().toLowerCase().equals(jwtUtils.extractUsername(token).toLowerCase())) {
-                        return new ResponseEntity<>(HttpStatus.OK);
-                    }
-                }
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
+            Users u = usersR.findByemail(email);
+            if (u != null) {
+                return new ResponseEntity<>(HttpStatus.OK);
             }
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
