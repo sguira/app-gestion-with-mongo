@@ -276,7 +276,7 @@ public class UsersController {
     }
 
     // check_mail
-    @GetMapping("/check_mail")
+    @GetMapping("/check_mail/{email}")
     ResponseEntity<?> verification(@PathVariable String email) {
 
         try {
