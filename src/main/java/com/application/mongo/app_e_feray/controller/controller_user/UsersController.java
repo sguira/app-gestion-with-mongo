@@ -98,7 +98,7 @@ public class UsersController {
     @PostMapping(path = "/login")
     ResponseEntity<Map> login(@RequestBody Users u) {
 
-        List<Users> result = usersR.findAll();
+        // List<Users> result = usersR.findAll();
         // for (var i : result) {
         // System.out.println(i.getEmail() + "\n\n");
         // }
