@@ -57,7 +57,7 @@ public class CategorieController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 System.out.println("Client " + u.getName());
                 List<Categorie> cats = (List<Categorie>) (u.getCategories());
                 if (cats.size() > 0) {
@@ -109,7 +109,7 @@ public class CategorieController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
 
                 Categorie cat = catR.findById(cat_.getId()).get();
                 cat.setName(cat_.getName());
@@ -131,7 +131,7 @@ public class CategorieController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                return new ResponseEntity<List<Categorie>>(usersR.findByemail(token).getCategories(),
+                return new ResponseEntity<List<Categorie>>(usersR.findByEmail(token).getCategories(),
                         HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

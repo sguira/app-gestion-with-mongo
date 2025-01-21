@@ -69,7 +69,7 @@ public class RentreeController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
 
                 String item = v.getEspece() + "," + v.getDate();
                 v.addVentes(item);

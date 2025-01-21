@@ -63,7 +63,7 @@ public class ControllerClient {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 List<Client> clients = new ArrayList<Client>();
                 clients = u.getClients();
                 Client cc = clientR.save(c);
@@ -84,7 +84,7 @@ public class ControllerClient {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 u.ajouter_contact(c);
                 usersR.save(u);
                 return new ResponseEntity<Contact>(contactRepo.save(c), HttpStatus.CREATED);
@@ -140,7 +140,7 @@ public class ControllerClient {
             token = tokenValide(token);
             if (token != null) {
                 return new ResponseEntity<List<Fournisseur>>(
-                        (List<Fournisseur>) usersR.findByemail(token).getFournisseurs(),
+                        (List<Fournisseur>) usersR.findByEmail(token).getFournisseurs(),
                         HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -156,7 +156,7 @@ public class ControllerClient {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 Client client = clientR.findById(c.getId()).get();
                 List<Client> clients = u.getClients();
                 for (int i = 0; i < clients.size(); i++) {
@@ -231,7 +231,7 @@ public class ControllerClient {
             token = tokenValide(token);
             if (token != null) {
                 return new ResponseEntity<List<Client>>(
-                        (List<Client>) usersR.findByemail(jwtUtils.extractUsername(token)).getClients(), HttpStatus.OK);
+                        (List<Client>) usersR.findByEmail(jwtUtils.extractUsername(token)).getClients(), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }

@@ -231,7 +231,7 @@ public class controller {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 double achat = 0;
                 double vente = 0;
                 double payeV = 0;
@@ -347,7 +347,7 @@ public class controller {
         token = tokenValide(token);
         if (token != null) {
 
-            Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+            Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
             String[] date_ = date.split(",");
             for (var d : date_) {
                 System.out.println("Date: " + d + '\n');
@@ -503,7 +503,7 @@ public class controller {
             if (token != null) {
                 System.out.println("\n\ntaches: \n" + t);
 
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 Tache tache = tacheR.save(t);
                 u.ajouter_tache(tache);
                 usersR.save(u);
@@ -557,7 +557,7 @@ public class controller {
             if (token != null) {
                 List<Tache> taches = new ArrayList<>();
 
-                usersR.findByemail(jwtUtils.extractUsername(token)).getTaches().forEach(e -> {
+                usersR.findByEmail(jwtUtils.extractUsername(token)).getTaches().forEach(e -> {
                     if (e.getDate_().equals(date)) {
                         taches.add(e);
                     }
@@ -639,7 +639,7 @@ public class controller {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users utilisateur = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users utilisateur = usersR.findByEmail(jwtUtils.extractUsername(token));
 
                 for (var commande : utilisateur.getCommande()) {
                     if (commande.getRef().toLowerCase().equals(c.getRef().toLowerCase())) {
@@ -669,7 +669,7 @@ public class controller {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 List<Commande> commandes = new ArrayList<>();
 
                 commandes = u.getCommande();
@@ -708,7 +708,7 @@ public class controller {
         try {
             token = tokenValide(token);
             if (token != null) {
-                List<ventes> v = usersR.findByemail(jwtUtils.extractUsername(token)).getVentes();
+                List<ventes> v = usersR.findByEmail(jwtUtils.extractUsername(token)).getVentes();
 
                 List<ventes> v_ = new ArrayList<>();
                 v.forEach((e) -> {
@@ -733,7 +733,7 @@ public class controller {
             token = tokenValide(token);
             if (token != null) {
                 System.out.println(path);
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 u.setImage_url(path);
                 u.getInfo().setLogo(path);
                 usersR.save(u);
@@ -753,7 +753,7 @@ public class controller {
             token = tokenValide(token);
             if (token != null) {
                 List<Double> annee = new ArrayList<Double>();
-                List<ventes> ventes = usersR.findByemail(jwtUtils.extractUsername(token)).getVentes();
+                List<ventes> ventes = usersR.findByEmail(jwtUtils.extractUsername(token)).getVentes();
                 for (int i = 1; i <= 12; i++) {
                     Double montant = 0d;
                     for (int j = 0; j < ventes.size(); j++) {

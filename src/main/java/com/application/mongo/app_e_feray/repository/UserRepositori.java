@@ -35,6 +35,6 @@ public interface UserRepositori extends MongoRepository<Users, String> {
     @Query(value = "SELECT * from ventes join users where users_id=:#{#id}")
     Object ventes_by_clients(@Param("id") String id);
 
-    Users findByemail(String username);
+    Users findByEmail(String email);
 
 }

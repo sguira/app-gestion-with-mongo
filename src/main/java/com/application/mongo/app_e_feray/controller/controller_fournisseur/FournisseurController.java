@@ -61,7 +61,7 @@ public class FournisseurController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 Fournisseur f_ = fournisseurRepo.save(f);
                 u.ajouter_fournisseur(f_);
                 usersR.save(u);
@@ -84,7 +84,7 @@ public class FournisseurController {
             if (token != null) {
 
                 if (!id_.equals("-1")) {
-                    Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                    Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                     Fournisseur f = fournisseurRepo.findById(id_).get();
                     String val = a.getDate() + a.getDesignation() + a.getEspece();
                     String remboursement = a.getEspece() + "," + a.getDate();
@@ -98,7 +98,7 @@ public class FournisseurController {
                     fournisseurRepo.save(f);
                     return new ResponseEntity<Achat>(a_, HttpStatus.CREATED);
                 } else {
-                    Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                    Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                     a.setNomFournisseur("Inconnu");
                     Achat a_ = achatR.save(a);
                     u.ajouter_achats(a_);
@@ -121,7 +121,7 @@ public class FournisseurController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
 
                 List<Fournisseur> f = u.getFournisseurs();
                 Fournisseur fournisseur = fournisseurRepo.findById(c.getId()).get();
@@ -168,7 +168,7 @@ public class FournisseurController {
     ResponseEntity<List<Achat>> find_achats(@RequestHeader("Authorization") String token) {
         token = tokenValide(token);
         if (token != null) {
-            return new ResponseEntity<List<Achat>>(usersR.findByemail(jwtUtils.extractUsername(token)).getAchats(),
+            return new ResponseEntity<List<Achat>>(usersR.findByEmail(jwtUtils.extractUsername(token)).getAchats(),
                     HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

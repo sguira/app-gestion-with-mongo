@@ -38,7 +38,7 @@ public class Auth {
         String username = user.getEmail();
         String password = user.getPassword();
 
-        Users u = userR.findByemail(username);
+        Users u = userR.findByEmail(username);
 
         if (u == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");

@@ -51,7 +51,7 @@ public class Users {
     String code;
     String finAbonnement;
     String numeroCompte;
-    private String recuperation;
+    private String recuperation = "";
 
     private List<String> articlesFrequent = new ArrayList<>();
 

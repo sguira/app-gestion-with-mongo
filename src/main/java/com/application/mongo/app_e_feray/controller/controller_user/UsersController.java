@@ -80,7 +80,7 @@ public class UsersController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
                 if (passwordEncoder.matches(body.get("hold"), user.getPassword())) {
                     user.setPassword(passwordEncoder.encode(body.get("password")));
                     usersR.save(user);
@@ -98,22 +98,17 @@ public class UsersController {
     @PostMapping(path = "/login")
     ResponseEntity<Map> login(@RequestBody Users u) {
 
-        // List<Users> result = usersR.findAll();
-        // for (var i : result) {
-        // System.out.println(i.getEmail() + "\n\n");
-        // }
-
-        // ajouté
         Map<String, String> res = new HashMap<>();
-        Users user = usersR.findByemail(u.getEmail());
-        String encode = passwordEncoder.encode(u.getPassword());
-
+        Users user = usersR.findByEmail(u.getEmail());
+        // String encode = passwordEncoder.encode(u.getPassword());
+        System.out.println("Login appelé \n\n");
+        System.out.println("username:" + u.getEmail() + "\nusername:" + user.getEmail());
         if (user != null) {
             if (!user.getPassword().equals("")) {
                 if (user.getEmail().equals(u.getEmail()) &&
                         passwordEncoder.matches(u.getPassword(), user.getPassword())
                         && user.getRecuperation().equals("")) {
-                    // System.out.println("\n\n" + result.get(i).getEmail());
+
                     if (user.isConfirmed()) {
                         res.put("token", jwtUtils.generateToken(u.getEmail()));
                         res.put("code", "1");
@@ -211,7 +206,7 @@ public class UsersController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
                 if (u.getEmail().equals(user.getEmail())) {
                     user.setName(u.getName());
                     user.setEmail(u.getEmail());
@@ -230,20 +225,13 @@ public class UsersController {
 
     }
 
-    // ancien
-    // @GetMapping(path = "/get_user/{id}")
-    // ResponseEntity<Users> getUser(@PathVariable(name = "id") String id) {
-    // return new ResponseEntity<Users>(usersR.findById(id).get(), HttpStatus.OK);
-    // }
-
-    // nouveau
     @GetMapping(path = "/get_user")
     ResponseEntity<Users> getUser(@RequestHeader("Authorization") String token) {
         try {
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
                 String username = jwtUtils.extractUsername(token);
-                Users u = usersR.findByemail(username);
+                Users u = usersR.findByEmail(username);
                 if (u != null) {
                     return new ResponseEntity<Users>(u, HttpStatus.OK);
                 } else {
@@ -280,7 +268,7 @@ public class UsersController {
     ResponseEntity<?> verification(@PathVariable String email) {
 
         try {
-            Users u = usersR.findByemail(email);
+            Users u = usersR.findByEmail(email);
             if (u != null) {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -361,7 +349,7 @@ public class UsersController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
                 u.setMontantAbonnement(montant);
                 u.setSuscription(true);
                 u.setDateAbonnement(dateAbonnement);
@@ -480,7 +468,7 @@ public class UsersController {
             if (token.startsWith("Bearer ")) {
                 token = token.substring(7);
                 if (verifieToken(token)) {
-                    Users u = usersR.findByemail(jwtUtils.extractUsername(token));
+                    Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
 
                     userRender u_ = new userRender(u.getId(), u.getName(), u.getEmail(), u.getNumber(), u.getInfo(),
                             u.getDateAbonnement(), u.getFinAbonnement(), u.getNumeroCompte(), u.getAbonnements());
@@ -573,7 +561,7 @@ public class UsersController {
             token = tokenValide(token);
 
             if (token != null) {
-                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
                 List<String> articlesFreq = new ArrayList<>();
                 boolean exist = false;
                 for (int i = 0; i < articlesFreq.size(); i++) {
@@ -602,7 +590,7 @@ public class UsersController {
             token = tokenValide(token);
 
             if (token != null) {
-                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
                 List<String> articlesFreq = user.getArticlesFrequent();
                 // boolean exist=false;
 
@@ -629,7 +617,7 @@ public class UsersController {
             token = tokenValide(token);
 
             if (token != null) {
-                Users user = usersR.findByemail(jwtUtils.extractUsername(token));
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
                 List<String> articlesFreq = user.getArticlesFrequent();
 
                 for (int i = 0; i < articlesFreq.size(); i++) {
@@ -661,7 +649,7 @@ public class UsersController {
             token = tokenValide(token);
             if (token != null) {
                 return new ResponseEntity<List<String>>(
-                        usersR.findByemail(jwtUtils.extractUsername(token)).getArticlesFrequent(), HttpStatus.OK);
+                        usersR.findByEmail(jwtUtils.extractUsername(token)).getArticlesFrequent(), HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {

@@ -56,7 +56,7 @@ class DevisController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users user = userR.findByemail(jwtUtils.extractUsername(token));
+                Users user = userR.findByEmail(jwtUtils.extractUsername(token));
 
                 devisR.save(devis);
                 user.ajouterDevis(devis);
@@ -81,7 +81,7 @@ class DevisController {
         try {
             token = tokenValide(token);
             if (token != null) {
-                Users u = userR.findByemail(jwtUtils.extractUsername(token));
+                Users u = userR.findByEmail(jwtUtils.extractUsername(token));
                 if (u != null) {
                     return new ResponseEntity<>(u.getDevis(), HttpStatus.OK);
                 }
