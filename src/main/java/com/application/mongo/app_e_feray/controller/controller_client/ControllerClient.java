@@ -139,13 +139,15 @@ public class ControllerClient {
         try {
             token = tokenValide(token);
             if (token != null) {
+                String username = jwtUtils.extractUsername(token);
                 return new ResponseEntity<>(
-                        usersR.findByEmail(token).getFournisseurs(),
+                        usersR.findByEmail(username).getFournisseurs(),
                         HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
