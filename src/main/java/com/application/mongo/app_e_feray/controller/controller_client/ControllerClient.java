@@ -134,7 +134,7 @@ public class ControllerClient {
     // return clientR.search_by_name(id, name);
     // }
 
-    @GetMapping(path = "/get_fournisseur/{id}")
+    @GetMapping(path = "/get_fournisseur")
     ResponseEntity<List<Fournisseur>> fournisseurs(@RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
