@@ -29,7 +29,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin
-@RequestMapping(path = "/backend/clients")
+@RequestMapping(path = "/api/v1/clients")
 public class ControllerClient {
     @Autowired(required = true)
     private ClientRepo clientR;

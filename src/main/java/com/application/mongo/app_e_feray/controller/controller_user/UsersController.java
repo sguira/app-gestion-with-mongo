@@ -39,7 +39,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/users")
+@RequestMapping(path = "/api/v1/users")
 public class UsersController {
 
     @Autowired
@@ -93,111 +93,6 @@ public class UsersController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @PostMapping(path = "/login")
-    ResponseEntity<Map> login(@RequestBody Users u) {
-
-        Map<String, String> res = new HashMap<>();
-        Users user = usersR.findByEmail(u.getEmail());
-        // String encode = passwordEncoder.encode(u.getPassword());
-        System.out.println("Login appelé \n\n");
-        System.out.println("username:" + u.getEmail() + "\nusername:" + user.getEmail());
-        if (user != null) {
-            if (!user.getPassword().equals("")) {
-                if (user.getEmail().equals(u.getEmail()) &&
-                        passwordEncoder.matches(u.getPassword(), user.getPassword())
-                        && user.getRecuperation().equals("")) {
-
-                    if (user.isConfirmed()) {
-                        res.put("token", jwtUtils.generateToken(u.getEmail()));
-                        res.put("code", "1");
-                        return new ResponseEntity<>(res, HttpStatus.OK);
-                    } else {
-                        res.put("code", "-3");
-                        return new ResponseEntity<>(res, HttpStatus.OK);
-                    }
-                }
-            } else if (user.getRecuperation() != null) {
-                // System.out.println("\n\n" + result.get(i).getEmail());
-                if (user.getEmail().equals(u.getEmail())
-                        && passwordEncoder.matches(u.getPassword(), user.getRecuperation())) {
-                    res.put("code", "-2");
-                    return new ResponseEntity<>(res, HttpStatus.OK);
-                } else {
-                    res.put("code", "-1");
-                    return new ResponseEntity<>(res, HttpStatus.OK);
-                }
-
-            }
-
-        }
-        res.put("code", "-1");
-        return new ResponseEntity<>(res, HttpStatus.OK);
-
-        // for (int i = 0; i < result.size(); i++) {
-
-        // if (!result.get(i).getPassword().equals("")) {
-        // if (result.get(i).getEmail().equals(u.getEmail()) &&
-        // passwordEncoder.matches(u.getPassword(), result.get(i).getPassword())
-        // && result.get(i).getRecuperation().equals("")) {
-        // // System.out.println("\n\n" + result.get(i).getEmail());
-        // if (result.get(i).isConfirmed()) {
-        // return result.get(i).getId();
-        // } else {
-        // return "-3";
-        // }
-        // }
-        // } else if (result.get(i).getRecuperation() != null) {
-        // // System.out.println("\n\n" + result.get(i).getEmail());
-        // if (result.get(i).getEmail().equals(u.getEmail())
-        // && passwordEncoder.matches(u.getPassword(), result.get(i).getRecuperation()))
-        // {
-        // return "-2";
-        // } else {
-        // return "-1";
-        // }
-
-        // }
-        // }
-        // return "-1";
-    }
-
-    @PostMapping(path = "/adduser")
-    ResponseEntity<Users> ajouterUtilisateur(@RequestBody Users u) {
-
-        if (!verifier.addUsers(usersR.findAll(), u.getEmail())) {
-            u.setConfirmCode(generateCode());
-            String password = passwordEncoder.encode(u.getPassword());
-            u.setPassword(password);
-            BodyEmail email = new BodyEmail();
-            // email.setRecipient(u.getEmail());
-            // email.setBody("Création de compte");
-            // email.setMessage(
-            // "Bienvenue sur Notre application\nVotre Compte a bien été crée avec les
-            // coordonnées suivante.\nNom:"
-            // + u.getName() + "\tEmail:" + u.getEmail() +
-            // "\t\u001B31 Nom entreprise:" + u.getInfo().getName() + "\tAddresse:"
-            // + u.getInfo().getAddresse() + "");
-            // // email.setRecipient(u.getEmail());
-            // // email.setBody("Création de compte");
-            email.setRecipient(u.getEmail());
-            email.setBody("Création de compte");
-            String res = emailService.sendHtlmlMail(email, creerHtmlBody(u, "Monsieur/Madame" + u.getName() +
-                    "Veuillez confirmer la création de votre compte sur L'application E-Ferray, <br>" +
-                    "avec le code suivant <u style='color: red;font-size: 26px;'>" + u.getConfirmCode() + "</u>"
-
-            ));
-            System.out.println(res);
-            if (res.equals("Mail Sent Successfully...")) {
-                return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<Users>(HttpStatus.BAD_GATEWAY);
-            }
-
-        }
-
-        return new ResponseEntity<Users>(HttpStatus.CONFLICT);
     }
 
     @PutMapping(path = "/update_user")
@@ -279,38 +174,6 @@ public class UsersController {
 
     }
 
-    @PostMapping(path = "/recuperation_password")
-    String recuperation(@RequestParam(name = "email") String email,
-            @RequestParam(name = "password1") String recuperation, @RequestParam(name = "password2") String password) {
-
-        try {
-
-            Users u = new Users();
-            for (var i = 0; i < usersR.findAll().size(); i++) {
-                if (usersR.findAll().get(i).getEmail().equals(email)) {
-                    u = usersR.findAll().get(i);
-                    break;
-                }
-            }
-            String passwordEncode = passwordEncoder.encode(recuperation);
-            u.setRecuperation(passwordEncode);
-            u.setPassword("");
-            usersR.save(u);
-            BodyEmail body = new BodyEmail();
-            body.setMessage(
-                    "Votre mot de passe à bien été modifier\n vous pouvez utiliser le nouveau mot de passe génerer automatiquement pour vous connecter. N'oubliez pas de le modifier après connecion\n Mot de passe Recupération:"
-                            + recuperation);
-            body.setBody("Recupération Mot de passe! ");
-            body.setRecipient(u.getEmail());
-            emailService.sendSimpleMessage(body);
-            return "OK";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "ERREUR";
-        }
-
-    }
-
     @PostMapping(path = "/updatePDP")
     String modificationMDP(@RequestParam(name = "recuperation") String recuperation,
             @RequestParam(name = "password") String password, @RequestParam(name = "email") String email) {
@@ -373,34 +236,6 @@ public class UsersController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @PostMapping(path = "confirmation-compte/{email}/{code}")
-    String confirmationCreation(@PathVariable(name = "email") String email, @PathVariable(name = "code") String code) {
-        List<Users> users = usersR.findAll();
-        for (var u : users) {
-            if (u.getEmail().equals(email) && u.getConfirmCode().equals(code)) {
-                u.setConfirmed(true);
-                u.setCode("");
-                usersR.save(u);
-                BodyEmail email_ = new BodyEmail();
-                email_.setBody("Compte crée.");
-                email_.setRecipient(email);
-                String res = emailService.sendHtlmlMail(email_, creerHtmlBody(u, "Félicitation, "
-                        + u.getName() +
-                        " Vous pouvez maintenant vous connecter à votre compte sur<br> l'application <u style='color:red;font-size:22px' >E-FERRAY</u>"
-                        +
-                        "Le nom d'utilisateur est votre mail: " + u.getEmail()));
-                System.out.println(res);
-                if (res.equals("Mail Sent Successfully...")) {
-                    return "OK";
-                } else {
-                    return "INCORRECT";
-                }
-
-            }
-        }
-        return "INCORRECT";
     }
 
     @GetMapping(path = "reset-code/{email}")
@@ -524,27 +359,6 @@ public class UsersController {
     // messageBody){
     // return new ResponseEntity<String>(HttpStatus.OK,"ENVOYER");
     // }
-
-    @PostMapping("vitrine/contact")
-    public ResponseEntity<String> postMethodName(@RequestBody VitrineEmail entity) {
-
-        try {
-            BodyEmail body = new BodyEmail();
-            body.setBody(entity.getSubject());
-            body.setRecipient("sguira96@gmail.com");
-            body.setMessage(entity.getMessage());
-
-            String envoi = emailService.sendSimpleMessage(body, entity.getEmail());
-            if (envoi == "Mail Sent Successfully...") {
-                return new ResponseEntity<String>("OK", HttpStatus.OK);
-            }
-            return new ResponseEntity<String>("ERROR", HttpStatus.CONFLICT);
-
-        } catch (Exception e) {
-            return new ResponseEntity<String>("ERROR", HttpStatus.CONFLICT);
-        }
-
-    }
 
     String customMail(VitrineEmail email) {
         return "<html><body>" +

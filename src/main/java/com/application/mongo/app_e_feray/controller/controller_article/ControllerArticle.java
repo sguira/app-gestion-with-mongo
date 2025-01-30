@@ -23,7 +23,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/articles")
+@RequestMapping(path = "/api/v1/articles")
 public class ControllerArticle {
 
     @Autowired(required = true)

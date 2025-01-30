@@ -60,7 +60,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping(path = "/backend")
+@RequestMapping(path = "/api/v1")
 public class controller {
 
     @Autowired(required = true)

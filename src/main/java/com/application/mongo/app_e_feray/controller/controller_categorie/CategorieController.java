@@ -24,7 +24,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/categories/")
+@RequestMapping(path = "/api/v1/categories/")
 public class CategorieController {
 
     @Autowired(required = true)

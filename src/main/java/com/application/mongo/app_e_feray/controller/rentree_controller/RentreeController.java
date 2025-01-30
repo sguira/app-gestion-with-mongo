@@ -28,7 +28,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/rentree")
+@RequestMapping(path = "/api/v1/rentree")
 public class RentreeController {
 
     @Autowired(required = true)

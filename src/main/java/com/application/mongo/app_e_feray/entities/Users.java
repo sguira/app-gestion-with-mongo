@@ -51,6 +51,7 @@ public class Users {
     String code;
     String finAbonnement;
     String numeroCompte;
+    private String role = "ROLE_USER";
     private String recuperation = "";
 
     private List<String> articlesFrequent = new ArrayList<>();

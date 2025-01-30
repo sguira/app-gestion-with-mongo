@@ -26,7 +26,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping(path = "/backend/fournisseurs/")
+@RequestMapping(path = "/api/v1/fournisseurs/")
 public class FournisseurController {
 
     @Autowired(required = true)

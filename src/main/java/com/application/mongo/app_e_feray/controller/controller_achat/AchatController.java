@@ -17,7 +17,7 @@ import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping(path = "/backend/achat/")
+@RequestMapping(path = "/api/v1/achat")
 public class AchatController {
 
     @Autowired(required = true)

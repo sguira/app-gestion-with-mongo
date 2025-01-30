@@ -24,7 +24,7 @@ import com.application.mongo.app_e_feray.repository.UserRepositori;
 import com.application.mongo.app_e_feray.services.JWTUtils;
 
 @RestController
-@RequestMapping("/backend/devis")
+@RequestMapping("/api/v1/devis")
 @CrossOrigin("*")
 class DevisController {
     @Autowired
