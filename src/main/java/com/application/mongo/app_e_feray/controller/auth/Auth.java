@@ -27,8 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.application.mongo.app_e_feray.controller.controller_user.verifier;
 import com.application.mongo.app_e_feray.email.BodyEmail;
 import com.application.mongo.app_e_feray.email.EmailServiceImp;
+import com.application.mongo.app_e_feray.entities.Abonnement;
 import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.entities.VitrineEmail;
+import com.application.mongo.app_e_feray.repository.AbonnementR;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 import com.application.mongo.app_e_feray.services.JWTUtils;
 
@@ -49,6 +51,8 @@ public class Auth {
     private final PasswordEncoder passwordEncoder;
 
     private final EmailServiceImp emailService;
+
+    private final AbonnementR abonnement;
 
     @PostMapping(path = "/login")
     ResponseEntity<Object> login(@RequestBody Users u) {
@@ -273,6 +277,11 @@ public class Auth {
             return new ResponseEntity<String>("ERROR", HttpStatus.CONFLICT);
         }
 
+    }
+
+    @GetMapping(path = "/abonnement")
+    ResponseEntity<List<Abonnement>> getAbonnement() {
+        return new ResponseEntity<List<Abonnement>>(abonnement.findAll(), HttpStatus.OK);
     }
 
 }
