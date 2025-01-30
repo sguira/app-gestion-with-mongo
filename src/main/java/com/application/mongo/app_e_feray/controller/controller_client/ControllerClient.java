@@ -135,12 +135,12 @@ public class ControllerClient {
     // }
 
     @GetMapping(path = "/get_fournisseur")
-    ResponseEntity<List<Fournisseur>> fournisseurs(@RequestHeader("Authorization") String token) {
+    ResponseEntity<Object> fournisseurs(@RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
             if (token != null) {
-                return new ResponseEntity<List<Fournisseur>>(
-                        (List<Fournisseur>) usersR.findByEmail(token).getFournisseurs(),
+                return new ResponseEntity<>(
+                        usersR.findByEmail(token).getFournisseurs(),
                         HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
