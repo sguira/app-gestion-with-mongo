@@ -53,6 +53,8 @@ public class Users {
     String numeroCompte;
     private String role = "ROLE_USER";
     private String recuperation = "";
+    private String oauthProvider;
+    private String oauthId;
 
     private List<String> articlesFrequent = new ArrayList<>();
 

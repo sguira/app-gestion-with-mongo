@@ -201,10 +201,7 @@ public class controller {
         return new ResponseEntity<>(usersR.save(u_), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/abonnement")
-    ResponseEntity<List<Abonnement>> getAbonnement() {
-        return new ResponseEntity<List<Abonnement>>(abonnement.findAll(), HttpStatus.OK);
-    }
+    
 
     @DeleteMapping("/delete_aboonement/{id}")
     ResponseEntity<?> deleteAbonnement(@PathVariable String id) {
