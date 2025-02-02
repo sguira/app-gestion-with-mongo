@@ -201,8 +201,6 @@ public class controller {
         return new ResponseEntity<>(usersR.save(u_), HttpStatus.CREATED);
     }
 
-    
-
     @DeleteMapping("/delete_aboonement/{id}")
     ResponseEntity<?> deleteAbonnement(@PathVariable String id) {
         abonnement.deleteById(id);
