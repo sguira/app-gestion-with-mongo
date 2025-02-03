@@ -36,6 +36,7 @@ public class Users {
     private String confirmCode = null;
     private boolean confirmed = false;
     private String description;
+
     class Abonnement_ {
 
     }
