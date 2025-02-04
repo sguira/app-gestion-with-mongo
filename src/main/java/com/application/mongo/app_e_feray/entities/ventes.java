@@ -37,6 +37,7 @@ public class ventes implements Serializable {
     private double regleInialement;
     private double tva = 0;
     private boolean tvaExored = false;
+    private String idClient;
     private String dateEcheance;
     private List<String> articles_ = new ArrayList<>();
 

@@ -307,15 +307,15 @@ public class controller {
     }
 
     // supprimer une commande
-    @DeleteMapping(path = "deleteCommande/{id_user}/{id_comande}")
-    ResponseEntity<?> deleteCommande(@PathVariable(name = "id_user") String idUser,
-            @PathVariable(name = "id_comande") String idCommande) {
+    @DeleteMapping(path = "deleteCommande/{id_comande}")
+    ResponseEntity<?> deleteCommande(@PathVariable(name = "id_comande") String idCommande,@RequestHeader("Authorization") String token ) {
         try {
-            Users user = usersR.findById(idUser).get();
-
-            commandeRepo.deleteById(idCommande);
-            System.out.println("Commande supprimée:" + idCommande);
-            return new ResponseEntity<>(HttpStatus.OK);
+            // Users user = usersR.findById(idUser).get();
+            token=valideToken(token);
+            if(token!=null){
+                
+            }
+            
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
