@@ -301,8 +301,8 @@ public class Auth {
 
     }
 
-    @GetMapping(path = "reset-code/{email}")
-    ResponseEntity<String> sendCodeMail(@PathVariable(name = "email") String email) {
+    @GetMapping(path = "/reset-code/{email}")
+    ResponseEntity<String> sendCodeMail(@PathVariable() String email) {
         List<Users> users = usersR.findAll();
         for (var u : users) {
             if (email.equals(u.getEmail())) {
