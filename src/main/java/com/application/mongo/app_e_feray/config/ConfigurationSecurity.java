@@ -51,7 +51,7 @@ public class ConfigurationSecurity {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 return http.csrf(h -> h.disable()).cors(c -> c.configurationSource(configurationSource()))
                                 .authorizeHttpRequests(
-                                                request -> request.requestMatchers("/api/v1/auth/*").permitAll()
+                                                request -> request.requestMatchers("/api/v1/auth/**").permitAll()
                                                                 .requestMatchers("/api/v1/docs/**",
                                                                                 "api/v1/swagger-ui/**", "swagger-ui/**",
                                                                                 "/swagger-ui/index.html",

@@ -301,8 +301,8 @@ public class Auth {
 
     }
 
-    @GetMapping(path = "/reset-code/{email}")
-    ResponseEntity<?> sendCodeMail(@PathVariable() String email) {
+    @GetMapping(path = "/resend-code/{email}")
+    ResponseEntity<?> sendCodeMail(@PathVariable String email) {
         Users users = usersR.findByEmail(email);
         try {
             if (email.equals(users.getEmail())) {
@@ -318,7 +318,7 @@ public class Auth {
                 users.setConfirmCode(code);
                 users.setConfirmed(true);
                 usersR.save(users);
-                return new ResponseEntity<String>("OK", HttpStatus.OK);
+                return ResponseEntity.ok("Code renvoyé");
 
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
