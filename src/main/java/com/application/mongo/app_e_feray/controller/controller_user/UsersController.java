@@ -158,22 +158,6 @@ public class UsersController {
         }
     }
 
-    // check_mail
-    @GetMapping("/check_mail/{email}")
-    ResponseEntity<?> verification(@PathVariable String email) {
-
-        try {
-            Users u = usersR.findByEmail(email);
-            if (u != null) {
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-    }
-
     @PostMapping(path = "/updatePDP")
     String modificationMDP(@RequestParam(name = "recuperation") String recuperation,
             @RequestParam(name = "password") String password, @RequestParam(name = "email") String email) {
