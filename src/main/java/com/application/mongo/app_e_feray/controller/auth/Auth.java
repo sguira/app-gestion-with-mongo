@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -298,6 +299,46 @@ public class Auth {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+    @GetMapping(path = "reset-code/{email}")
+    ResponseEntity<String> sendCodeMail(@PathVariable(name = "email") String email) {
+        List<Users> users = usersR.findAll();
+        for (var u : users) {
+            if (email.equals(u.getEmail())) {
+                BodyEmail emailBody = new BodyEmail();
+                String code = resetCode(email);
+                if (code != null) {
+                    emailBody.setRecipient(email);
+                    emailBody.setBody("Code de confirmation de Compte sur E-Ferray");
+                    emailBody.setMessage(
+                            "Ce Message est le code de confirmation de la création de votre compte sur Eferray. \n code:"
+                                    + code);
+                    emailService.sendSimpleMessage(emailBody);
+                    u.setConfirmCode(code);
+                    u.setConfirmed(true);
+                    usersR.save(u);
+                    return new ResponseEntity<String>("OK", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
+                }
+
+            }
+        }
+        return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
+    }
+
+    @Transactional
+    String resetCode(String email) {
+        for (var user : usersR.findAll()) {
+            if (user.getEmail().equals(email)) {
+                String code = generateCode();
+                user.setConfirmCode(code);
+                // usersR.save(user);
+                return code;
+            }
+        }
+        return null;
     }
 
 }
