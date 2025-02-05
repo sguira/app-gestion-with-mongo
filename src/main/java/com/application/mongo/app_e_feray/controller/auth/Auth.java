@@ -302,30 +302,31 @@ public class Auth {
     }
 
     @GetMapping(path = "/reset-code/{email}")
-    ResponseEntity<String> sendCodeMail(@PathVariable() String email) {
-        List<Users> users = usersR.findAll();
-        for (var u : users) {
-            if (email.equals(u.getEmail())) {
+    ResponseEntity<?> sendCodeMail(@PathVariable() String email) {
+        Users users = usersR.findByEmail(email);
+        try {
+            if (email.equals(users.getEmail())) {
                 BodyEmail emailBody = new BodyEmail();
                 String code = resetCode(email);
-                if (code != null) {
-                    emailBody.setRecipient(email);
-                    emailBody.setBody("Code de confirmation de Compte sur E-Ferray");
-                    emailBody.setMessage(
-                            "Ce Message est le code de confirmation de la création de votre compte sur Eferray. \n code:"
-                                    + code);
-                    emailService.sendSimpleMessage(emailBody);
-                    u.setConfirmCode(code);
-                    u.setConfirmed(true);
-                    usersR.save(u);
-                    return new ResponseEntity<String>("OK", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
-                }
 
+                emailBody.setRecipient(email);
+                emailBody.setBody("Code de confirmation de votre Compte sur E-Ferray");
+                emailBody.setMessage(
+                        "Ce Message est le code de confirmation de la création de votre compte sur Eferray. \n code:"
+                                + code);
+                emailService.sendSimpleMessage(emailBody);
+                users.setConfirmCode(code);
+                users.setConfirmed(true);
+                usersR.save(users);
+                return new ResponseEntity<String>("OK", HttpStatus.OK);
+
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<String>("INTROUVABLE", HttpStatus.OK);
+
     }
 
     @Transactional
