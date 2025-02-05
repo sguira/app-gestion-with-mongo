@@ -109,7 +109,7 @@ public class Auth {
 
     }
 
-    @GetMapping("get_user")
+    @GetMapping("/get_user")
     ResponseEntity<String> extract_user_name(@RequestHeader("Authorization") String token) {
         try {
             if (token.startsWith("Bearer ")) {
@@ -123,7 +123,7 @@ public class Auth {
         }
     }
 
-    @RequestMapping("validate_token")
+    @RequestMapping("/validate_token")
     public boolean validate(@RequestHeader("Authorization") String token) {
         try {
             if (token.startsWith("Bearer ")) {
@@ -231,7 +231,7 @@ public class Auth {
 
     }
 
-    @PostMapping(path = "confirmation-compte/{email}/{code}")
+    @PostMapping(path = "/confirmation-compte/{email}/{code}")
     String confirmationCreation(@PathVariable(name = "email") String email, @PathVariable(name = "code") String code) {
         List<Users> users = usersR.findAll();
         for (var u : users) {
@@ -259,7 +259,7 @@ public class Auth {
         return "INCORRECT";
     }
 
-    @PostMapping("vitrine/contact")
+    @PostMapping("/vitrine/contact")
     public ResponseEntity<String> postMethodName(@RequestBody VitrineEmail entity) {
 
         try {
@@ -331,13 +331,12 @@ public class Auth {
 
     @Transactional
     String resetCode(String email) {
-        for (var user : usersR.findAll()) {
-            if (user.getEmail().equals(email)) {
-                String code = generateCode();
-                user.setConfirmCode(code);
-                // usersR.save(user);
-                return code;
-            }
+        Users user = usersR.findByEmail(email);
+        if (user.getEmail().equals(email)) {
+            String code = generateCode();
+            user.setConfirmCode(code);
+            // usersR.save(user);
+            return code;
         }
         return null;
     }
