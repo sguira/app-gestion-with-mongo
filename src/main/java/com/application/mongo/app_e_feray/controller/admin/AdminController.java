@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private UserRepositori userR;
+    private final UserRepositori userR;
 
     @GetMapping("/users")
-    public ResponseEntity<Object> requestMethodName(@RequestParam String param) {
+    public ResponseEntity<Object> allUser() {
         return ResponseEntity.ok(userR.findAll());
     }
 
