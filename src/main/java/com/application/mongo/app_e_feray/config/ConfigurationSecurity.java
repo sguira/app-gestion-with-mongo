@@ -60,6 +60,7 @@ public class ConfigurationSecurity {
                                                                 .requestMatchers("/login/oauth2/**",
                                                                                 "https://accounts.google.com/signin/oauth/**")
                                                                 .permitAll()
+                                                                .requestMatchers("/api/v1/admin").hasRole("ADMIN")
                                                                 .anyRequest().authenticated())
 
                                 // .formLogin(AbstractHttpConfigurer::disable)
