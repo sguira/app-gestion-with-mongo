@@ -7,6 +7,7 @@ import com.application.mongo.app_e_feray.repository.VenteRepo;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +38,7 @@ public class AdminController {
     ResponseEntity delteVente(@PathVariable String id) {
         try {
             venteRepo.deleteById(id);
-            return ResponseEntity.ok("OK");
+            return ResponseEntity.ok(HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error");
         }
