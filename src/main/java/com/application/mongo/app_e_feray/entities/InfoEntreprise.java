@@ -1,6 +1,7 @@
 package com.application.mongo.app_e_feray.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,5 +23,9 @@ public class InfoEntreprise implements Serializable {
     String codeCnn;
     String ncr;
     String description = "";
+    String phrase_acroche = "";
+
+    // @I
+    // LocalDateTime createdAt;
 
 }
