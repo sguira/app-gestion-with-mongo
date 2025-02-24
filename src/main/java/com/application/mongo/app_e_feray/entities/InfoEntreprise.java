@@ -23,7 +23,7 @@ public class InfoEntreprise implements Serializable {
     String codeCnn;
     String ncr;
     String description = "";
-    String phrase_acroche = "";
+    String phraseAcroche = "";
 
     // @I
     // LocalDateTime createdAt;
