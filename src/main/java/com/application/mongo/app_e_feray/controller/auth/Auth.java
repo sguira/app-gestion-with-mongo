@@ -341,4 +341,9 @@ public class Auth {
         return null;
     }
 
+    @PostMapping("/notify")
+    String notifyPayement() {
+        return "Vous avez effectué un payement avec Ciney pay sur Efere";
+    }
+
 }
