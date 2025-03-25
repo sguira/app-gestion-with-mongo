@@ -85,7 +85,7 @@ public class Auth {
                     } else if (user.getRecuperation() != null) {
                         // System.out.println("\n\n" + result.get(i).getEmail());
                         if (user.getEmail().equals(u.getEmail())
-                                && passwordEncoder.matches(u.getPassword(), user.getRecuperation())) {
+                                && passwordEncoder.matches(user.getRecuperation(), u.getPassword())) {
                             res.put("code", "-2");
                             return new ResponseEntity<>(res, HttpStatus.OK);
                         } else {
