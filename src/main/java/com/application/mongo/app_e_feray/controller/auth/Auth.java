@@ -59,9 +59,8 @@ public class Auth {
     ResponseEntity<Object> login(@RequestBody Users u) {
         Map<String, String> res = new HashMap<>();
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
-            if (authentication.isAuthenticated()) {
+            
+            if (true) {
 
                 Users user = usersR.findByEmail(u.getEmail());
                 // String encode = passwordEncoder.encode(u.getPassword());
@@ -72,6 +71,8 @@ public class Auth {
                         if (user.getEmail().equals(u.getEmail()) &&
                                 passwordEncoder.matches(u.getPassword(), user.getPassword())
                                 && user.getRecuperation().equals("")) {
+                            Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
 
                             if (user.isConfirmed()) {
                                 res.put("token", jwtUtils.generateToken(u.getEmail()));
@@ -85,7 +86,7 @@ public class Auth {
                     } else if (user.getRecuperation() != null) {
                         // System.out.println("\n\n" + result.get(i).getEmail());
                         if (user.getEmail().equals(u.getEmail())
-                                && passwordEncoder.matches(user.getRecuperation(), u.getPassword())) {
+                                && passwordEncoder.matches( u.getPassword(),user.getRecuperation())) {
                             res.put("code", "-2");
                             return new ResponseEntity<>(res, HttpStatus.OK);
                         } else {
