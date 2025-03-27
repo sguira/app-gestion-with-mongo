@@ -83,14 +83,14 @@ public class Auth {
                                 return new ResponseEntity<>(res, HttpStatus.OK);
                             }
                         }
-                    } else if (user.getRecuperation() != null) {
+                    } else if (!user.getRecuperation().equals("")) {
                         // System.out.println("\n\n" + result.get(i).getEmail());
                         if (user.getEmail().equals(u.getEmail())
                                 && passwordEncoder.matches(u.getPassword(), user.getRecuperation())) {
                             res.put("code", "-2");
-                            Authentication authentication = authenticationManager.authenticate(
-                                    new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
-                            res.put("token", jwtUtils.generateToken(u.getEmail()));
+                            // Authentication authentication = authenticationManager.authenticate(
+                            // new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
+                            // res.put("token", jwtUtils.generateToken(u.getEmail()));
                             return new ResponseEntity<>(res, HttpStatus.OK);
                         } else {
                             res.put("code", "-1");
@@ -108,7 +108,7 @@ public class Auth {
         } catch (Exception e) {
             e.printStackTrace();
             res.put("code", "-1");
-            
+
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
 
