@@ -158,24 +158,6 @@ public class UsersController {
         }
     }
 
-    @PostMapping(path = "/updatePDP")
-    String modificationMDP(@RequestParam(name = "recuperation") String recuperation,
-            @RequestParam(name = "password") String password, @RequestParam(name = "email") String email) {
-
-        for (var user : usersR.findAll()) {
-            if (user.getEmail().equals(email) && passwordEncoder.matches(recuperation, user.getRecuperation())) {
-                user.setPassword(passwordEncoder.encode(password));
-                user.setRecuperation("");
-                usersR.save(user);
-                System.out.println(" \n\nmodifier\n\n");
-                return "OK";
-            }
-
-        }
-
-        return "ERROR";
-    }
-
     @GetMapping(path = "/updateSuscription/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
     ResponseEntity<Users> updatSuscription(@RequestHeader("Authorization") String token,
             @PathVariable(name = "prix") double montant,

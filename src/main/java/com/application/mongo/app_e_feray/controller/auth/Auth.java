@@ -106,11 +106,30 @@ public class Auth {
                 return ResponseEntity.status(HttpStatus.OK).body("Donnée incorrect");
             }
         } catch (Exception e) {
-            // e.printStackTrace();
+            e.printStackTrace();
             res.put("code", "-1");
+            
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
 
+    }
+
+    @PostMapping(path = "/updatePDP")
+    String modificationMDP(@RequestParam(name = "recuperation") String recuperation,
+            @RequestParam(name = "password") String password, @RequestParam(name = "email") String email) {
+
+        for (var user : usersR.findAll()) {
+            if (user.getEmail().equals(email) && passwordEncoder.matches(recuperation, user.getRecuperation())) {
+                user.setPassword(passwordEncoder.encode(password));
+                user.setRecuperation("");
+                usersR.save(user);
+                System.out.println(" \n\nmodifier\n\n");
+                return "OK";
+            }
+
+        }
+
+        return "ERROR";
     }
 
     @GetMapping("/get_user")
