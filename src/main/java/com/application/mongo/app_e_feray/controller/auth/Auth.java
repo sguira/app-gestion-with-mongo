@@ -59,7 +59,7 @@ public class Auth {
     ResponseEntity<Object> login(@RequestBody Users u) {
         Map<String, String> res = new HashMap<>();
         try {
-            
+
             if (true) {
 
                 Users user = usersR.findByEmail(u.getEmail());
@@ -72,7 +72,7 @@ public class Auth {
                                 passwordEncoder.matches(u.getPassword(), user.getPassword())
                                 && user.getRecuperation().equals("")) {
                             Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
+                                    new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
 
                             if (user.isConfirmed()) {
                                 res.put("token", jwtUtils.generateToken(u.getEmail()));
@@ -86,8 +86,11 @@ public class Auth {
                     } else if (user.getRecuperation() != null) {
                         // System.out.println("\n\n" + result.get(i).getEmail());
                         if (user.getEmail().equals(u.getEmail())
-                                && passwordEncoder.matches( u.getPassword(),user.getRecuperation())) {
+                                && passwordEncoder.matches(u.getPassword(), user.getRecuperation())) {
                             res.put("code", "-2");
+                            Authentication authentication = authenticationManager.authenticate(
+                                    new UsernamePasswordAuthenticationToken(u.getEmail(), u.getPassword()));
+                            res.put("token", jwtUtils.generateToken(u.getEmail()));
                             return new ResponseEntity<>(res, HttpStatus.OK);
                         } else {
                             res.put("code", "-1");
