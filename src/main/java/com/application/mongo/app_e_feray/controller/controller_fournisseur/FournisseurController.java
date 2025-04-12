@@ -55,7 +55,7 @@ public class FournisseurController {
         }
     }
 
-    @PostMapping(path = "/add_fournisseur", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/add_fournisseur")
     ResponseEntity<Fournisseur> add_fournisseur(@RequestBody Fournisseur f,
             @RequestHeader("Authorization") String token) {
         try {
@@ -74,7 +74,7 @@ public class FournisseurController {
         }
     }
 
-    @PostMapping(path = "/add_achat/{id_2}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/add_achat/{id_2}")
     ResponseEntity<Achat> ajouter_depense(@RequestHeader("Authorization") String token,
             @PathVariable(name = "id_2") String id_,
             @RequestBody Achat a) {
@@ -115,7 +115,7 @@ public class FournisseurController {
     }
 
     // Fonction pour modifier un client
-    @PutMapping(path = "/update_fournisseur", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PutMapping(path = "/update_fournisseur")
     ResponseEntity<Fournisseur> update_fournisseur(@RequestHeader("Authorization") String token,
             @RequestBody Fournisseur c) {
         try {
@@ -157,14 +157,14 @@ public class FournisseurController {
 
     }
 
-    @GetMapping(path = "/all_achat/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/all_achat/{id}")
     List<?> all_achats(@PathVariable(name = "id") String id) {
         List<Achat> v = usersR.findById(id).get().getAchats();
         return v;
 
     }
 
-    @GetMapping(path = "achats", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "achats")
     ResponseEntity<List<Achat>> find_achats(@RequestHeader("Authorization") String token) {
         token = tokenValide(token);
         if (token != null) {

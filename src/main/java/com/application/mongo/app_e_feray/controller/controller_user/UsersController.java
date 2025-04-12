@@ -95,7 +95,7 @@ public class UsersController {
         }
     }
 
-    @PutMapping(path = "/update_user", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PutMapping(path = "/update_user")
     ResponseEntity<Users> modifierUtilisateur(@RequestBody Users u, @RequestHeader("Authorization") String token) {
 
         try {
@@ -120,7 +120,7 @@ public class UsersController {
 
     }
 
-    @GetMapping(path = "/get_user", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/get_user")
     ResponseEntity<Users> getUser(@RequestHeader("Authorization") String token) {
         try {
             if (token.startsWith("Bearer ")) {
@@ -140,7 +140,7 @@ public class UsersController {
     }
 
     // verifierToken
-    @GetMapping(path = "/verifier_token", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/verifier_token")
     ResponseEntity<String> verifierToken(@RequestHeader("Authorization") String token) {
         try {
             if (token.startsWith("Bearer ")) {

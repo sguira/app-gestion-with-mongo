@@ -58,7 +58,7 @@ public class ControllerClient {
     }
 
     // ajouter un nouveau client
-    @PostMapping(path = "/add_client", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/add_client")
     ResponseEntity<Client> ajouter_client(@RequestBody Client c, @RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
@@ -79,7 +79,7 @@ public class ControllerClient {
         }
     }
 
-    @PostMapping(path = "/add_contact", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PostMapping(path = "/add_contact")
     ResponseEntity<Contact> ajouterContact(@RequestBody Contact c, @RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
@@ -153,7 +153,7 @@ public class ControllerClient {
     }
 
     // Fonction pour modifier un client
-    @PutMapping(path = "/update_client", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PutMapping(path = "/update_client")
     ResponseEntity<Client> update_client(@RequestHeader("Authorization") String token, @RequestBody Client c) {
         try {
             token = tokenValide(token);
@@ -181,7 +181,7 @@ public class ControllerClient {
         }
     }
 
-    @PutMapping(path = "/client_modifier/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @PutMapping(path = "/client_modifier/{id}")
     ResponseEntity<Client> modifier(Long id, Client client) {
         // List<Client> clients=usersR.findById(id).get().getClients();
         // clients.forEach((c)->{
@@ -195,7 +195,7 @@ public class ControllerClient {
     }
 
     // get client by id
-    @GetMapping(path = "/get_client_by_id/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/get_client_by_id/{id}")
     ResponseEntity<Client> client(@PathVariable String id, @RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
