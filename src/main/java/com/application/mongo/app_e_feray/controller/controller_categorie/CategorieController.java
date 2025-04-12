@@ -50,7 +50,7 @@ public class CategorieController {
         }
     }
 
-    @PostMapping(path = "/addcategorie")
+    @PostMapping(path = "/addcategorie", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Categorie> ajouterCategorie(@RequestBody Categorie cat,
             @RequestHeader("Authorization") String token) {
 
@@ -86,7 +86,7 @@ public class CategorieController {
 
     }
 
-    @DeleteMapping(path = "/delete_categorie/{id}")
+    @DeleteMapping(path = "/delete_categorie/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> deletecategorie(@RequestHeader("Authorization") String token, @PathVariable String id)
             throws Exception {
         try {
@@ -103,7 +103,7 @@ public class CategorieController {
         }
     }
 
-    @PutMapping(value = "/update_categorie")
+    @PutMapping(value = "/update_categorie", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Categorie> updateCategorie(@RequestHeader("Authorization") String token, @RequestBody Categorie cat_)
             throws Exception {
         try {
@@ -126,7 +126,7 @@ public class CategorieController {
 
     }
 
-    @GetMapping(path = "/all_categories")
+    @GetMapping(path = "/all_categories", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<Categorie>> get_categorie_by_user(@RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);

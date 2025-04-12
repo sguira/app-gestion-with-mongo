@@ -40,7 +40,7 @@ public class AchatController {
         }
     }
 
-    @PostMapping(path = "update_achats/{id}/{montant}/{date}")
+    @PostMapping(path = "update_achats/{id}/{montant}/{date}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Achat> updateAchat(@PathVariable(name = "id") String id,
             @PathVariable(name = "montant") double montant, @PathVariable(name = "date") String date,
             @RequestHeader("Authorization") String token) {
@@ -61,7 +61,7 @@ public class AchatController {
         }
     }
 
-    @GetMapping(path = "get_achat_by_id/{id}")
+    @GetMapping(path = "get_achat_by_id/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Achat> getSingleAchat(@PathVariable String id, @RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);

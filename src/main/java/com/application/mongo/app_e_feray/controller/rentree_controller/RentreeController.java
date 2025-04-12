@@ -63,7 +63,7 @@ public class RentreeController {
         }
     }
 
-    @PostMapping(path = "/add_ventes/{id_clients}")
+    @PostMapping(path = "/add_ventes/{id_clients}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<ventes> ajouter_ventes(@RequestBody ventes v, @RequestHeader("Authorization") String token,
             @PathVariable(name = "id_clients") String id_2) {
         try {
@@ -124,7 +124,7 @@ public class RentreeController {
 
     }
 
-    @GetMapping(path = "vente_client/{id}")
+    @GetMapping(path = "vente_client/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<ventes>> vente_by_client(@PathVariable String id) {
         return new ResponseEntity<List<ventes>>(clientR.findById(id).get().getVentes(), HttpStatus.OK);
     }

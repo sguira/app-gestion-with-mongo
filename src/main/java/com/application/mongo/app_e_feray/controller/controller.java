@@ -189,7 +189,7 @@ public class controller {
 
     // }
 
-    @PostMapping(path = "/update_user/{id}")
+    @PostMapping(path = "/update_user/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Users> modifierUser(@RequestBody Users u, @PathVariable String id) {
         Users u_ = usersR.findById(id).get();
 
@@ -207,18 +207,18 @@ public class controller {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PostMapping(path = "/save_abonnement")
+    @PostMapping(path = "/save_abonnement", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Abonnement> saveAbonnement(@RequestBody Abonnement abonnement_) {
         return new ResponseEntity<Abonnement>(abonnement.save(abonnement_), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/all_contact/{id}")
+    @GetMapping(path = "/all_contact/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<Contact>> contacts(@PathVariable(name = "id") String id) {
         return new ResponseEntity<List<Contact>>((List<Contact>) usersR.findById(id).get().getContacts(),
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/get_bilan/{date1}/{date2}")
+    @GetMapping(path = "/get_bilan/{date1}/{date2}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Bilan> bilan_ventes(@PathVariable(name = "date2") String date2,
             @PathVariable(name = "date1") String date1, @RequestHeader(name = "Authorization") String token) {
         Bilan bilan = new Bilan();
@@ -339,7 +339,7 @@ public class controller {
         }
     }
 
-    @GetMapping(path = "vente_semaine_2/{date}")
+    @GetMapping(path = "vente_semaine_2/{date}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<Double>> getVenteSemaine2(@RequestHeader("Authorization") String token,
             @PathVariable(name = "date") String date) {
         List<Double> montant = new ArrayList<Double>();
@@ -471,17 +471,12 @@ public class controller {
     }
 
     // ventes de la semaine
-    @GetMapping("/vente_de_la_semaine")
+    @GetMapping(path = "/vente_de_la_semaine", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     List<?> vente_semaine() {
         return usersR.ventes_de_la_semaine();
     }
 
-    @GetMapping("/index")
-    public String getMethodName() {
-        return "index";
-    }
-
-    @GetMapping(path = "/all_ventes/{id}")
+    @GetMapping(path = "/all_ventes/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     List<?> all_ventes(@PathVariable(name = "id") Long id) {
         List<?> v = new ArrayList<>();
         v = usersR.all_ventes(id);
@@ -489,12 +484,12 @@ public class controller {
 
     }
 
-    @GetMapping(path = "ventes/{id}")
+    @GetMapping(path = "ventes/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<ventes>> find_ventes(@PathVariable(name = "id") String id) {
         return new ResponseEntity<List<ventes>>(usersR.findById(id).get().getVentes(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/add_tache")
+    @PostMapping(path = "/add_tache", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Tache> add_tache(@RequestHeader(name = "Authorization") String token, @RequestBody Tache t) {
 
         try {
@@ -532,7 +527,7 @@ public class controller {
 
     }
 
-    @PutMapping(path = "/updateTache/{id}")
+    @PutMapping(path = "/updateTache/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Tache> modifierTache(@RequestBody Tache tache, @PathVariable String id,
             @RequestHeader("Authorization") String token) throws Exception {
 
@@ -631,7 +626,7 @@ public class controller {
         return res;
     }
 
-    @PostMapping("/ajouterCommande/{id2}")
+    @PostMapping(path = "/ajouterCommande/{id2}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Commande> addCommande(@RequestBody Commande c, @RequestHeader(name = "Authorization") String token,
             @PathVariable(name = "id2") String id2) {
 
@@ -662,7 +657,7 @@ public class controller {
         }
     }
 
-    @GetMapping("/allCommande")
+    @GetMapping(path = "/allCommande", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<Commande>> getCommandeByUser(@RequestHeader("Authorization") String token) {
 
         try {
@@ -700,7 +695,7 @@ public class controller {
         }
     }
 
-    @GetMapping("/getVenteCommande/{name}")
+    @GetMapping(path = "/getVenteCommande/{name}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<ventes>> getventeBycommande(@RequestHeader("Authorization") String token,
             @PathVariable("name") String name) {
 
@@ -797,7 +792,7 @@ public class controller {
         }
     }
 
-    @PostMapping(path = "update_ventes/{id}/{montant}/{date}/{choice}")
+    @PostMapping(path = "update_ventes/{id}/{montant}/{date}/{choice}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> updateVente(@PathVariable(name = "id") String id,
             @PathVariable(name = "montant") double montant, @PathVariable(name = "date") String date,
             @PathVariable int choice, @RequestHeader("Authorization") String token) {

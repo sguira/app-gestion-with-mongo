@@ -50,7 +50,7 @@ class DevisController {
         }
     }
 
-    @PostMapping(path = "/devis")
+    @PostMapping(path = "/devis", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> ajouterDevis(@RequestBody Devis devis, @RequestHeader("Authorization") String token) {
 
         try {
@@ -76,7 +76,7 @@ class DevisController {
     // return new ResponseEntity<>(u.getDevis(), HttpStatus.OK);
     // }
 
-    @GetMapping(path = "/devis")
+    @GetMapping(path = "/devis", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<List<Devis>> getDevis(@RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);

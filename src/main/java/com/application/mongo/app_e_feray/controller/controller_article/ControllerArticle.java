@@ -49,7 +49,7 @@ public class ControllerArticle {
         }
     }
 
-    @PostMapping(path = "/ajouter_produit/{id}")
+    @PostMapping(path = "/ajouter_produit/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Produit> ajouter_produitf(@RequestBody Produit p, @PathVariable String id,
             @RequestHeader("Authorization") String token) {
         try {
@@ -67,7 +67,7 @@ public class ControllerArticle {
         }
     }
 
-    @PutMapping(path = "/add_article/{id}")
+    @PutMapping(path = "/add_article/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Produit> ajouter_article(@RequestBody Produit p, @PathVariable(name = "id") String id,
             @RequestHeader("Authorization") String token) {
         try {
@@ -94,7 +94,7 @@ public class ControllerArticle {
         }
     }
 
-    @PutMapping(path = "/update_article/{id_}")
+    @PutMapping(path = "/update_article/{id_}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<Produit> modifier_article(@RequestBody Produit p, @RequestHeader("Authorization") String token,
             @PathVariable(name = "id_") String id_) {
 
@@ -122,7 +122,7 @@ public class ControllerArticle {
         }
     }
 
-    @PostMapping(path = "/save_produit/{id_2}")
+    @PostMapping(path = "/save_produit/{id_2}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> save_article(@PathVariable(name = "id_2") String id, @RequestHeader("Authorization") String token,
             Produit produit) {
 
@@ -143,7 +143,7 @@ public class ControllerArticle {
         }
     }
 
-    @PostMapping(value = "/ajouter_produit2/{id}")
+    @PostMapping(value = "/ajouter_produit2/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
     ResponseEntity<?> save_produit2(@PathVariable(name = "id") String id, @RequestBody Produit p,
             @RequestHeader("Authorization") String token) {
 
