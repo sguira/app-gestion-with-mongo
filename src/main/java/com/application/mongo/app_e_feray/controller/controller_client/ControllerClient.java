@@ -96,7 +96,7 @@ public class ControllerClient {
         }
     }
 
-    @GetMapping(path = "/get_client/{id}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/get_client/{id}")
     ResponseEntity<List<ventes>> get_clients_ventes(@PathVariable(name = "id") String id,
             @RequestHeader("Authorization") String token) {
 
@@ -113,7 +113,7 @@ public class ControllerClient {
         }
     }
 
-    @GetMapping(path = "/ventes_for_clients/{id}/{choice}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/ventes_for_clients/{id}/{choice}")
     ResponseEntity<List<ventes>> getVentes(@PathVariable String id, @PathVariable(name = "choice") Long choice,
             @RequestHeader("Authorization") String token) {
         try {
@@ -134,7 +134,7 @@ public class ControllerClient {
     // return clientR.search_by_name(id, name);
     // }
 
-    @GetMapping(path = "/get_fournisseur", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/get_fournisseur")
     ResponseEntity<Object> fournisseurs(@RequestHeader("Authorization") String token) {
         try {
             token = tokenValide(token);
@@ -226,7 +226,7 @@ public class ControllerClient {
         }
     }
 
-    @GetMapping(path = "/get_clients", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+    @GetMapping(path = "/get_clients")
     ResponseEntity<List<Client>> clients(@RequestHeader("Authorization") String token) {
 
         try {
