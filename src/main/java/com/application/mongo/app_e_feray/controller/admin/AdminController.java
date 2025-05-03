@@ -2,6 +2,7 @@ package com.application.mongo.app_e_feray.controller.admin;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.application.mongo.app_e_feray.dto.UserNameEmailProjection;
 import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.repository.UserRenderRepository;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
@@ -50,7 +51,7 @@ public class AdminController {
     }
 
     @GetMapping(path = "/list-user")
-    ResponseEntity<List<Users>> getListUser() {
+    ResponseEntity<List<UserNameEmailProjection>> getListUser() {
         return ResponseEntity.ok(userRenderRepository.findByAll());
     }
 

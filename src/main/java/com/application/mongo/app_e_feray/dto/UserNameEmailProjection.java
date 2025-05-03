@@ -9,8 +9,6 @@ public interface UserNameEmailProjection {
 
     String getId();
 
-    String getImage_url();
-
     String getNumber();
 
     String getFinAbonnement();

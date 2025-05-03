@@ -8,9 +8,9 @@ import org.springframework.data.mongodb.repository.Query;
 import com.application.mongo.app_e_feray.dto.UserNameEmailProjection;
 import com.application.mongo.app_e_feray.entities.Users;
 
-public interface UserRenderRepository extends MongoRepository<UserNameEmailProjection, String> {
+public interface UserRenderRepository extends MongoRepository<Users, String> {
 
-    @Query(value = "{}", fields = "{ 'name' : 1, 'email' : 1 ,'number' : 1, 'id' : 1, 'image_url' : 1, 'finAbonnement' : 1, 'description' : 1, 'dateCreation' : 1 }")
-    List<Users> findByAll();
+    @Query(value = "{}", fields = "{ 'name' : 1, 'email' : 1 ,'number' : 1, 'id' : 1, 'finAbonnement' : 1, 'description' : 1, 'dateCreation' : 1 }")
+    List<UserNameEmailProjection> findByAll();
 
 }

@@ -1,5 +1,6 @@
 package com.application.mongo.app_e_feray.entities;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -56,6 +57,7 @@ public class Users {
     private String recuperation = "";
     private String oauthProvider;
     private String oauthId;
+    private LocalDate dateCreation = LocalDate.now();
 
     private List<String> articlesFrequent = new ArrayList<>();
 
