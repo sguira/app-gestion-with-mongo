@@ -15,5 +15,9 @@ public interface UserNameEmailProjection {
 
     String getDescription();
 
+    boolean getSuscription();
+
+    boolean getConfirmed();
+
     LocalDate getDateCreation();
 }
