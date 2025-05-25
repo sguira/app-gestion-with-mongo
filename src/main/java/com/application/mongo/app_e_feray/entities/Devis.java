@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.application.mongo.app_e_feray.dto.TypeDevis;
+
 import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +26,6 @@ public class Devis {
     private String description;
     private double montant;
     private String title;
+    private TypeDevis type = TypeDevis.DEVIS;
     List<String> articles = new ArrayList<>();
 }
