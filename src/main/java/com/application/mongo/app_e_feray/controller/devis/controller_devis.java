@@ -87,7 +87,7 @@ class DevisController {
                 if (u != null) {
                     List<Devis> devis = new ArrayList<>();
                     for (var e : devis) {
-                        if (e.getType() == TypeDevis.DEVIS) {
+                        if (e.getType().equals("DEVIS")) {
                             devis.add(e);
                         }
                     }
@@ -109,7 +109,7 @@ class DevisController {
                 if (u != null) {
                     List<Devis> devis = new ArrayList<>();
                     for (var e : devis) {
-                        if (e.getType() == TypeDevis.BON_COMMANDE) {
+                        if (e.getType().equals("BON_COMMANDE")) {
                             devis.add(e);
                         }
                     }

@@ -26,6 +26,6 @@ public class Devis {
     private String description;
     private double montant;
     private String title;
-    private TypeDevis type = TypeDevis.DEVIS;
+    private String type = "DEVIS";
     List<String> articles = new ArrayList<>();
 }
