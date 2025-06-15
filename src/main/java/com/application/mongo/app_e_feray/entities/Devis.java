@@ -27,5 +27,6 @@ public class Devis {
     private double montant;
     private String title;
     private String type = "DEVIS";
+    private String reference;
     List<String> articles = new ArrayList<>();
 }
