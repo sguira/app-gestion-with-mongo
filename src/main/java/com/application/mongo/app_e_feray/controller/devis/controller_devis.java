@@ -108,7 +108,7 @@ class DevisController {
                 Users u = userR.findByEmail(jwtUtils.extractUsername(token));
                 if (u != null) {
                     List<Devis> devis = new ArrayList<>();
-                    for (var e : devis) {
+                    for (var e : u.getDevis()) {
                         if (e.getType().equals("BON_COMMANDE")) {
                             devis.add(e);
                         }
