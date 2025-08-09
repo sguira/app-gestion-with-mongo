@@ -38,12 +38,10 @@ import com.application.mongo.app_e_feray.entities.Bilan;
 import com.application.mongo.app_e_feray.entities.Client;
 import com.application.mongo.app_e_feray.entities.Commande;
 import com.application.mongo.app_e_feray.entities.Contact;
-// import com.application.mongo.app_e_feray.entities.Fournisseur;
-// import com.application.mongo.app_e_feray.entities.InfoEntreprise;
-// import com.application.mongo.app_e_feray.entities.Produit;
+
 import com.application.mongo.app_e_feray.entities.Tache;
 import com.application.mongo.app_e_feray.entities.Users;
-import com.application.mongo.app_e_feray.entities.userRender;
+
 import com.application.mongo.app_e_feray.entities.ventes;
 import com.application.mongo.app_e_feray.repository.AbonnementR;
 import com.application.mongo.app_e_feray.repository.AchatR;
@@ -129,20 +127,19 @@ public class controller {
 
     String creerHtmlBody(Users users, String message) {
         String body = "";
-        body += "<!DOCTYPE html>" +
-                "<html lang='fr'>" +
-                "<body><div style='margin: 12px auto;max-width: 550px;display: contents;flex-direction: column;flex-wrap: nowrap;'>"
-                +
-                "<div style='background-color: rgb(56, 109, 109);width: 500px;padding: 22px;border-radius: 8px;'>" +
-                "<h2 style='color: white;text-align: center;''>Bienvenue Sur E-Ferray</h2>" +
-                "</div><div style='margin: 22px auto;position:relative;left:20px;'>" +
-                message +
-                "</div><div style='width: 150px;height: 200px;display: contents;justify-content: center;'>" +
-                // "<img
+        body += "<!DOCTYPE html>"
+                + "<html lang='fr'>"
+                + "<body><div style='margin: 12px auto;max-width: 550px;display: contents;flex-direction: column;flex-wrap: nowrap;'>"
+                + "<div style='background-color: rgb(56, 109, 109);width: 500px;padding: 22px;border-radius: 8px;'>"
+                + "<h2 style='color: white;text-align: center;''>Bienvenue Sur E-Ferray</h2>"
+                + "</div><div style='margin: 22px auto;position:relative;left:20px;'>"
+                + message
+                + "</div><div style='width: 150px;height: 200px;display: contents;justify-content: center;'>"
+                + // "<img
                 // src='http://drive.google.com/uc?export=view&id=1ExYFBFWAFWu-IVaRdgwHf4FWHGcnktYB'
                 // alt='' >" +
-                "<img src='cid:imageId' alt='Logo' >" +
-                "</div>" + "</div></body></html>";
+                "<img src='cid:imageId' alt='Logo' >"
+                + "</div>" + "</div></body></html>";
 
         return body;
     }
@@ -158,7 +155,6 @@ public class controller {
     // @RequestParam(name = "addresse") String addrese,
     // @RequestParam(name = "num") String num,
     // @RequestParam(name = "codeCnn") String codeCnn) {
-
     // Users users = new Users();
     // users.setName(name);
     // users.setEmail(email);
@@ -180,15 +176,11 @@ public class controller {
     // System.out.print("mon erreru" + e.toString());
     // } finally {
     // if (!verifier.addUsers(usersR.findAll(), email)) {
-
     // return new ResponseEntity<>(usersR.save(users), HttpStatus.CREATED);
     // }
-
     // return new ResponseEntity<Users>(HttpStatus.CONFLICT);
     // }
-
     // }
-
     @PostMapping(path = "/update_user/{id}")
     ResponseEntity<Users> modifierUser(@RequestBody Users u, @PathVariable String id) {
         Users u_ = usersR.findById(id).get();

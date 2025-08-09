@@ -1,12 +1,23 @@
 package com.application.mongo.app_e_feray.controller.controller_user;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +40,16 @@ import com.application.mongo.app_e_feray.email.BodyEmail;
 import com.application.mongo.app_e_feray.email.EmailServiceImp;
 import com.application.mongo.app_e_feray.entities.Abonnement;
 import com.application.mongo.app_e_feray.entities.DetailAbonnement;
+import com.application.mongo.app_e_feray.entities.Payement;
 import com.application.mongo.app_e_feray.entities.Users;
 import com.application.mongo.app_e_feray.entities.VitrineEmail;
 import com.application.mongo.app_e_feray.entities.userRender;
 import com.application.mongo.app_e_feray.repository.AbonnementR;
 import com.application.mongo.app_e_feray.repository.DetailAbonnementRepo;
+import com.application.mongo.app_e_feray.repository.PayementRepository;
 import com.application.mongo.app_e_feray.repository.UserRepositori;
 import com.application.mongo.app_e_feray.services.JWTUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @CrossOrigin("*")
@@ -46,15 +60,31 @@ public class UsersController {
     private UserRepositori usersR;
 
     @Autowired
+    private PayementRepository payementR;
+
+    @Autowired
     private EmailServiceImp emailService;
+
+    @Value("${cinetpay.api.key}")
+    private String apiKey;
+
+    @Value("${cinetpay.api.site-id}")
+    private String siteId;
+
+    @Value("${cinetpay.api.check-url}")
+    private String checkUrl;
 
     // @Autowired
     // private AbonnementR abonnementR;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
     private DetailAbonnementRepo detailAbonnementR;
+
+    @Autowired
+    private AbonnementR abonnementR;
 
     @Autowired
     private JWTUtils jwtUtils;
@@ -70,6 +100,30 @@ public class UsersController {
             return null;
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @PostMapping(path = "/init-payement")
+    ResponseEntity<String> initPayement(@RequestHeader("Authorization") String token,
+            @RequestBody Payement payement) {
+        try {
+            token = tokenValide(token);
+            if (token != null) {
+                Users user = usersR.findByEmail(jwtUtils.extractUsername(token));
+                if (user != null) {
+                    payement.setUserId(user.getId());
+                    payement.setEmail(user.getEmail());
+                    payement.setDate(Instant.now());
+                    payement.setStatus("PENDING");
+                    // DetailAbonnement abonnement = new DetailAbonnement();
+                    // payement = detailAbonnementR.save(payement);
+                    return new ResponseEntity<>(payement.getId(), HttpStatus.CREATED);
+                }
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -139,6 +193,71 @@ public class UsersController {
         }
     }
 
+    @GetMapping(path = "/check_transaction_id/{transactionId}")
+    ResponseEntity<Map<String, Object>> checkTransactionId(@PathVariable String transactionId) {
+        System.out.println("Checking transaction ID: " + transactionId);
+        Object result = _checkTransactionId(transactionId);
+        if (result == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to check transaction ID"));
+        }
+        Map<String, Object> response = (Map<String, Object>) result;
+        if (response.get("code").equals("00")) {
+            return ResponseEntity.ok().body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Transaction ID not found or invalid"));
+        }
+
+    }
+
+    public Map<String, Object> _checkTransactionId(String transactionId) {
+        try {
+            String checkUrl = "https://api-checkout.cinetpay.com/v2/payment/check";
+
+            URL url = new URL(checkUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            // Prépare les données JSON avec tes vrais identifiants
+            Map<String, String> requestData = new HashMap<>();
+            requestData.put("transaction_id", transactionId);
+            requestData.put("site_id", siteId); // ta variable siteId
+            requestData.put("apikey", apiKey); // ta variable apiKey
+
+            String jsonInputString = new ObjectMapper().writeValueAsString(requestData);
+
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    // Retourne la réponse parsée en Map
+                    return new ObjectMapper().readValue(response.toString(), Map.class);
+                }
+            } else {
+                throw new RuntimeException("Failed : HTTP error code : " + responseCode);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     // verifierToken
     @GetMapping(path = "/verifier_token")
     ResponseEntity<String> verifierToken(@RequestHeader("Authorization") String token) {
@@ -158,16 +277,42 @@ public class UsersController {
         }
     }
 
-    @GetMapping(path = "/updateSuscription/{dateDebut}/{dateFin}/{prix}/{number}/{duree}")
-    ResponseEntity<Users> updatSuscription(@RequestHeader("Authorization") String token,
-            @PathVariable(name = "prix") double montant,
-            @PathVariable(name = "dateDebut") String dateAbonnement,
-            @PathVariable(name = "dateFin") String finAbonnement,
-            @PathVariable(name = "number") String numero,
-            @PathVariable(name = "duree") int duree
-
-    ) {
+    @PostMapping(path = "/updateSuscription")
+    ResponseEntity<?> updatSuscription(@RequestHeader("Authorization") String token, @RequestBody Payement payement) {
         try {
+
+            token = tokenValide(token);
+            if (token != null) {
+                if (checkTransactionId(payement.getTransactionId()).getStatusCode() != HttpStatus.OK) {
+                    return new ResponseEntity<>("Transaction ID not valid", HttpStatus.BAD_REQUEST);
+                }
+                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
+                payement.setUserId(u.getId());
+                payement.setEmail(u.getEmail());
+                payement.setDate(Instant.now());
+                payement.setStatus("SUCCESS");
+                payement.setAbonnementId(u.getId());
+                Abonnement abonnement = abonnementR.findById(u.getId()).orElse(null);
+                if (payement.getMontant() <= 0) {
+                    return new ResponseEntity<>("Montant invalide", HttpStatus.BAD_REQUEST);
+                }
+                Instant datefinActuelle = Instant.parse(u.getFinAbonnement());
+                if (u.getFinAbonnement() == null) {
+                    u.setFinAbonnement(
+                            formatter.format(Instant.now().plusSeconds(abonnement.getDuree() * 24 * 60 * 60)));
+                } else {
+                    if (datefinActuelle.isBefore(Instant.now())) {
+                        u.setFinAbonnement(
+                                formatter.format(Instant.now().plusSeconds(abonnement.getDuree() * 24 * 60 * 60)));
+                    } else {
+                        u.setFinAbonnement(
+                                formatter.format(datefinActuelle.plusSeconds(abonnement.getDuree() * 24 * 60 * 60)));
+                    }
+                }
+                payementR.save(payement);
+                return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access");
 
         } catch (Exception e) {
             System.out.println("Erreur abonnement.");
@@ -175,33 +320,6 @@ public class UsersController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
-        try {
-            token = tokenValide(token);
-            if (token != null) {
-                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
-                u.setMontantAbonnement(montant);
-                u.setSuscription(true);
-                u.setDateAbonnement(dateAbonnement);
-                u.setFinAbonnement(finAbonnement);
-                DetailAbonnement abonnement = new DetailAbonnement();
-                abonnement.setDateAbonnement(dateAbonnement);
-                abonnement.setFinAbonnement(finAbonnement);
-                abonnement.setNumero(numero);
-                abonnement.setPrix(montant);
-                abonnement.setDuree(duree);
-                // abonnement.setLabel(numero);
-                abonnement = detailAbonnementR.save(abonnement);
-
-                u.addAbonnement(abonnement);
-                System.out.println("Abonnement");
-                return new ResponseEntity<>(usersR.save(u), HttpStatus.CREATED);
-
-            }
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping(path = "reset-code/{email}")
