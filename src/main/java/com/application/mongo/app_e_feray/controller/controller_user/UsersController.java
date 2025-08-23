@@ -8,6 +8,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,7 +80,8 @@ public class UsersController {
     // private AbonnementR abonnementR;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+            .withZone(ZoneId.systemDefault());
 
     @Autowired
     private DetailAbonnementRepo detailAbonnementR;
@@ -286,17 +289,32 @@ public class UsersController {
                 if (checkTransactionId(payement.getTransactionId()).getStatusCode() != HttpStatus.OK) {
                     return new ResponseEntity<>("Transaction ID not valid", HttpStatus.BAD_REQUEST);
                 }
-                Users u = usersR.findByEmail(jwtUtils.extractUsername(token));
+                Users u = usersR.findByEmail(jwtUtils
+                        .extractUsername(token));
                 payement.setUserId(u.getId());
                 payement.setEmail(u.getEmail());
                 payement.setDate(Instant.now());
                 payement.setStatus("SUCCESS");
-                payement.setAbonnementId(u.getId());
-                Abonnement abonnement = abonnementR.findById(u.getId()).orElse(null);
-                if (payement.getMontant() <= 0) {
+
+                System.out.println("Abonnement ID: " + payement.getAbonnementId());
+                Abonnement abonnement = null;
+                for (Abonnement ab : abonnementR.findAll()) {
+                    System.out.println(String.format("Checking Abonnement ID: %s against Payement Abonnement ID: %s",
+                            ab.getId(), payement.getAbonnementId()));
+                    if (ab.getId().equals(payement.getAbonnementId())) {
+                        abonnement = ab;
+                        break;
+                    }
+                }
+                if (abonnement == null) {
+                    return new ResponseEntity<>("Abonnement not found", HttpStatus.NOT_FOUND);
+                }
+                if (abonnement.getPrix() <= 0) {
                     return new ResponseEntity<>("Montant invalide", HttpStatus.BAD_REQUEST);
                 }
-                Instant datefinActuelle = Instant.parse(u.getFinAbonnement());
+                Instant datefinActuelle = LocalDateTime.parse(u.getFinAbonnement(), formatter)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant();
                 if (u.getFinAbonnement() == null) {
                     u.setFinAbonnement(
                             formatter.format(Instant.now().plusSeconds(abonnement.getDuree() * 24 * 60 * 60)));
